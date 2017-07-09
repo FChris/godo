@@ -7,14 +7,31 @@ import (
 	"os"
 	"time"
 	"strings"
+	"sort"
 )
 
-type task struct {
-	task    string
-	dueTime time.Time
+type Task struct {
+	description string
+	dueTime     time.Time
+	complete    bool
+}
+
+type TaskList []Task
+
+func (t TaskList) Len() int {
+	return len(t)
+}
+
+func (t TaskList) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t TaskList) Less(i, j int) bool {
+	return t[i].dueTime.Before(t[j].dueTime)
 }
 
 func main() {
+	taskList := make(TaskList, 5, 10)
 
 	run := true
 	for run {
@@ -32,11 +49,11 @@ func main() {
 
 		switch action {
 		case "a", "A", "add":
-			fmt.Println("What is the task:")
+			fmt.Println("What is the description:")
 			desc, err := reader.ReadString('\n')
 			desc = strings.Trim(desc, "\n")
 			if err != nil {
-				log.Fatal("Could not read task")
+				log.Fatal("Could not read description")
 				return
 			}
 
@@ -45,7 +62,7 @@ func main() {
 			dateString = strings.Trim(dateString, "\n")
 			if err != nil {
 				log.Fatal("Could not read due date")
-				return
+				continue
 			}
 
 			dueTime := time.Now()
@@ -56,10 +73,58 @@ func main() {
 				}
 			}
 
-			task := task{desc, dueTime}
-			fmt.Println(task)
+			task := Task{desc, dueTime, false}
+			taskList = append(taskList, task)
+
+		case "p", "P", "print":
+			var currentDate time.Time
+
+			sort.Sort(taskList)
+
+			for _, task := range taskList {
+				if currentDate.YearDay() != task.dueTime.YearDay() || currentDate.Year() != task.dueTime.Year() {
+					fmt.Println()
+					currentDate = task.dueTime
+					dateString := currentDate.Format("01.02.06")
+					fmt.Println(dateString)
+				}
+				fmt.Println(task.description)
+			}
+
 		case "q", "Q", "quit":
 			run = false
+		}
+	}
+
+	saveToFile(taskList);
+}
+
+func saveToFile(list TaskList) {
+	file, error := os.Open(os.Args[1])
+	if error != nil {
+		if os.IsNotExist(error) {
+			file, error = os.Create(os.Args[1])
+			if error != nil {
+				panic(error)
+			}
+		} else {
+			panic(error)
+		}
+	}
+	sort.Sort(list)
+	var currentDate time.Time
+	for _, task := range list {
+		if currentDate.YearDay() != task.dueTime.YearDay() || currentDate.Year() != task.dueTime.Year() {
+			fmt.Println()
+			currentDate = task.dueTime
+			dateString := currentDate.Format("01.02.06")
+			file.Write([]byte(dateString))
+			file.Write([]byte("\n"))
+		}
+		if task.complete {
+			file.Write([]byte("[X]" + task.description + "\n"))
+		} else {
+			file.Write([]byte("[ ]" + task.description + "\n"))
 		}
 	}
 }
