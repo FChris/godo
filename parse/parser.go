@@ -65,9 +65,9 @@ func (p *Parser) Parse() (*Task, error) {
 	}
 
 	if tok == IDENT {
-		task.complete = true
+		task.Complete = true
 	} else {
-		task.complete = false
+		task.Complete = false
 	}
 
 	if tok, lit := p.scan(); tok != STATUS_CLOSE {
@@ -92,7 +92,7 @@ func (p *Parser) Parse() (*Task, error) {
 		buf.WriteString(lit)
 	}
 
-	task.description = buf.String()
+	task.Description = buf.String()
 
 	if tok, lit := p.scanIgnoreWhitespace(); tok != DATE_OPEN {
 		return nil, fmt.Errorf("found %q, expected [", lit)
@@ -110,7 +110,7 @@ func (p *Parser) Parse() (*Task, error) {
 			if err != nil {
 				return nil, err
 			}
-			task.dueTime = dueTime
+			task.DueTime = dueTime
 			break
 		}
 
