@@ -1,10 +1,11 @@
 package parse
 
 import (
+	"bytes"
+	"fmt"
 	"io"
 	"time"
-	"fmt"
-	"bytes"
+	"strings"
 )
 
 type Task struct {
@@ -14,7 +15,7 @@ type Task struct {
 }
 
 type Parser struct {
-	s *Scanner
+	s   *Scanner
 	buf struct {
 		tok Token  //last read token
 		lit string //last string literal
@@ -43,6 +44,9 @@ func (p *Parser) scan() (tok Token, lit string) {
 	return
 }
 
+// unscan pushes the previously read token back onto the buffer.
+func (p *Parser) unscan() { p.buf.n = 1 }
+
 func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	tok, lit = p.scan()
 	if tok == WS {
@@ -59,15 +63,14 @@ func (p *Parser) Parse() (*Task, error) {
 		return nil, fmt.Errorf("found %q, expected [", lit)
 	}
 
-	tok, lit := p.scan()
-	if tok != WS && tok != IDENT {
+	if tok, lit := p.scan(); tok != WS && tok != IDENT {
 		return nil, fmt.Errorf("found %q, expected WS or X", lit)
-	}
-
-	if tok == IDENT {
-		task.Complete = true
 	} else {
-		task.Complete = false
+		if tok == IDENT {
+			task.Complete = true
+		} else {
+			task.Complete = false
+		}
 	}
 
 	if tok, lit := p.scan(); tok != STATUS_CLOSE {
@@ -80,11 +83,11 @@ func (p *Parser) Parse() (*Task, error) {
 		//Read a field
 		tok, lit := p.scan()
 
-		if tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN {
+		if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != DATE_OPEN {
 			return nil, fmt.Errorf("found %q, expected field", lit)
 		}
 
-		if tok == STATUS_OPEN {
+		if tok == DATE_OPEN {
 			p.s.unread()
 			break
 		}
@@ -92,7 +95,7 @@ func (p *Parser) Parse() (*Task, error) {
 		buf.WriteString(lit)
 	}
 
-	task.Description = buf.String()
+	task.Description = strings.Trim(buf.String(), " ")
 
 	if tok, lit := p.scanIgnoreWhitespace(); tok != DATE_OPEN {
 		return nil, fmt.Errorf("found %q, expected [", lit)

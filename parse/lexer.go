@@ -2,8 +2,8 @@ package parse
 
 import (
 	"bufio"
-	"io"
 	"bytes"
+	"io"
 )
 
 type Token int
@@ -15,27 +15,19 @@ const (
 	WS
 
 	//Literals
-	IDENT  //todos and dates
+	IDENT //todos and dates
 
 	//Key Symbols
-	STATUS_OPEN   //[
-	STATUS_CLOSE  //]
-	DATE_OPEN     //{
-	DATE_CLOSE    //}
+	STATUS_OPEN  //[
+	STATUS_CLOSE //]
+	DATE_OPEN    //{
+	DATE_CLOSE   //}
 
 	//Misc
-	ASTERISK  //*
-	COMMA     //,
-	DOT       //.
+	ASTERISK //*
+	COMMA    //,
+	DOT      //.
 )
-
-func isWhitespace(ch rune) bool {
-	return ch == ' ' || ch == '\t' || ch == '\n'
-}
-
-func isLetter(ch rune) bool {
-	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
-}
 
 var eof = rune(0)
 
@@ -74,7 +66,7 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 	if isWhitespace(ch) {
 		s.unread()
 		return s.scanWhitespace()
-	} else if isLetter(ch) {
+	} else if isLetter(ch) || isDigit(ch) {
 		s.unread()
 		return s.scanIdent()
 	}
@@ -112,7 +104,7 @@ func (s *Scanner) scanWhitespace() (tok Token, lit string) {
 	for {
 		if ch := s.read(); ch == eof {
 			break
-		} else if isLetter(ch) {
+		} else if !isWhitespace(ch) {
 			s.unread()
 			break
 		} else {
@@ -133,7 +125,7 @@ func (s *Scanner) scanIdent() (tok Token, lit string) {
 	for {
 		if ch := s.read(); ch == eof {
 			break
-		} else if isWhitespace(ch) {
+		} else if !isLetter(ch) && !isDigit(ch) {
 			s.unread()
 			break
 		} else {
@@ -142,4 +134,16 @@ func (s *Scanner) scanIdent() (tok Token, lit string) {
 	}
 
 	return IDENT, buf.String()
+}
+
+func isWhitespace(ch rune) bool {
+	return ch == ' ' || ch == '\t' || ch == '\n'
+}
+
+func isLetter(ch rune) bool {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+}
+
+func isDigit(ch rune) bool {
+	return ch >= '0' && ch <= '9'
 }
