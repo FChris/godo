@@ -37,6 +37,7 @@ func main() {
 	fmt.Println(*fileName)
 
 	taskList = parseFromFile(*fileName)
+	fmt.Println(taskList)
 
 	if *interactive {
 		shell(*fileName)
@@ -119,19 +120,18 @@ func parseFromFile(fileName string) (list TaskList) {
 	defer file.Close()
 
 	parser := parse.NewParser(file)
-	taskList := make(TaskList, 5, 10)
 
+	list = make(TaskList, 0, 10)
 	var task *parse.Task
 	for {
 		task, error = parser.Parse()
 		if error != nil {
 			return
 		}
+		list = append(list, *task)
 	}
 
-	taskList = append(taskList, *task)
-
-	return taskList
+	return list
 }
 
 func saveToFile(list TaskList, fileName string) {
