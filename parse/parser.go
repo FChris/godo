@@ -8,9 +8,9 @@ import (
 )
 
 type Task struct {
-	description string
-	dueTime     time.Time
-	complete    bool
+	Description string
+	DueTime     time.Time
+	Complete    bool
 }
 
 type Parser struct {
