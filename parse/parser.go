@@ -52,7 +52,7 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	return
 }
 
-func (p *Parser) parse() (*Task, error) {
+func (p *Parser) Parse() (*Task, error) {
 	task := &Task{}
 
 	if tok, lit := p.scanIgnoreWhitespace(); tok != STATUS_OPEN {
