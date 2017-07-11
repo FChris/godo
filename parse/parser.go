@@ -1,21 +1,16 @@
 package parse
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"time"
+	"bytes"
 	"strings"
+	"github.com/fchris/godo/task"
 )
 
-type Task struct {
-	Description string
-	DueTime     time.Time
-	Complete    bool
-}
-
 type Parser struct {
-	s   *Scanner
+	s *Scanner
 	buf struct {
 		tok Token  //last read token
 		lit string //last string literal
@@ -56,69 +51,80 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	return
 }
 
-func (p *Parser) Parse() (*Task, error) {
-	task := &Task{}
+func (p *Parser) Parse() (*task.Day, error) {
+	taskDay := &task.Day{} //What are we actually doing here?
 
-	if tok, lit := p.scanIgnoreWhitespace(); tok != STATUS_OPEN {
-		return nil, fmt.Errorf("found %q, expected [", lit)
-	}
-
-	if tok, lit := p.scan(); tok != WS && tok != IDENT {
-		return nil, fmt.Errorf("found %q, expected WS or X", lit)
-	} else {
-		if tok == IDENT {
-			task.Complete = true
-		} else {
-			task.Complete = false
-		}
-	}
-
-	if tok, lit := p.scan(); tok != STATUS_CLOSE {
-		return nil, fmt.Errorf("found %q, expected ]", lit)
+	if tok, lit := p.scanIgnoreWhitespace(); tok != HASHTAG {
+		return nil, fmt.Errorf("found %q, expected #", lit)
 	}
 
 	var buf bytes.Buffer
-
 	for {
 		//Read a field
 		tok, lit := p.scan()
 
-		if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != DATE_OPEN {
-			return nil, fmt.Errorf("found %q, expected field", lit)
+		if tok != IDENT && tok != DOT && tok != WS {
+			return nil, fmt.Errorf("found %q, expected field or dot", lit)
 		}
 
-		if tok == DATE_OPEN {
-			p.s.unread()
-			break
-		}
-
-		buf.WriteString(lit)
-	}
-
-	task.Description = strings.Trim(buf.String(), " ")
-
-	if tok, lit := p.scanIgnoreWhitespace(); tok != DATE_OPEN {
-		return nil, fmt.Errorf("found %q, expected [", lit)
-	}
-
-	buf.Reset()
-	for {
-		tok, lit := p.scanIgnoreWhitespace()
-		if tok != IDENT && tok != DOT && tok != DATE_CLOSE {
-			return nil, fmt.Errorf("found %q, expected field", lit)
-		}
-
-		if tok == DATE_CLOSE {
+		if tok == WS {
 			dueTime, err := time.Parse("01.02.06", buf.String())
 			if err != nil {
 				return nil, err
 			}
-			task.DueTime = dueTime
+			taskDay.Date = dueTime
 			break
 		}
 
 		buf.WriteString(lit)
 	}
+	buf.Reset()
 
-	return task, nil
+	for {
+		task := &task.Todo{}
+
+		tok, lit := p.scanIgnoreWhitespace()
+		if tok == HASHTAG || tok == EOF {
+			return taskDay, nil
+		}
+
+		if tok != STATUS_OPEN {
+			return nil, fmt.Errorf("found %q, expected [", lit)
+		}
+
+		if tok, lit := p.scan(); tok != WS && tok != IDENT {
+			return nil, fmt.Errorf("found %q, expected WS or X", lit)
+		} else {
+			if tok == IDENT {
+				task.Complete = true
+			} else {
+				task.Complete = false
+			}
+		}
+
+		if tok, lit := p.scan(); tok != STATUS_CLOSE {
+			return nil, fmt.Errorf("found %q, expected ]", lit)
+		}
+
+		var buf bytes.Buffer
+
+		for {
+			//Read a field
+			tok, lit := p.scan()
+
+			if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN && tok != EOF {
+				return nil, fmt.Errorf("found %q, expected field", lit)
+			}
+
+			if tok == EOF || tok == STATUS_OPEN {
+				p.s.unread()
+				break
+			}
+
+			buf.WriteString(lit)
+		}
+
+		task.Description = strings.Trim(buf.String(), " ")
+		taskDay.Todos = append(taskDay.Todos, *task)
+	}
 }

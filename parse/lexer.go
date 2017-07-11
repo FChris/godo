@@ -20,13 +20,12 @@ const (
 	//Key Symbols
 	STATUS_OPEN  //[
 	STATUS_CLOSE //]
-	DATE_OPEN    //{
-	DATE_CLOSE   //}
 
 	//Misc
 	ASTERISK //*
 	COMMA    //,
 	DOT      //.
+	HASHTAG  //#
 )
 
 var eof = rune(0)
@@ -73,10 +72,8 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 
 	//Otherwise read individual character
 	switch ch {
-	case '{':
-		return DATE_OPEN, "{"
-	case '}':
-		return DATE_CLOSE, "}"
+	case '#':
+		return HASHTAG, "#"
 	case '[':
 		return STATUS_OPEN, "["
 	case ']':
