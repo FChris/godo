@@ -10,34 +10,21 @@ import (
 	"sort"
 	"flag"
 	"github.com/fchris/godo/parse"
+	"github.com/fchris/godo/task"
 )
 
-type TaskList []parse.Task
-
-func (t TaskList) Len() int {
-	return len(t)
-}
-
-func (t TaskList) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
-}
-
-func (t TaskList) Less(i, j int) bool {
-	return t[i].DueTime.Before(t[j].DueTime)
-}
-
-var taskList TaskList
+var dayList task.DayList
 
 func main() {
 
 	interactive := flag.Bool("interactive", false, "Trigger interactive mode")
-	fileName := flag.String("f", "", "Filename to read from and write to")
+	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
 	flag.Parse()
 
 	fmt.Println(*fileName)
 
-	taskList = parseFromFile(*fileName)
-	fmt.Println(taskList)
+	dayList = parseFromFile(*fileName)
+	fmt.Println(dayList)
 
 	if *interactive {
 		shell(*fileName)
@@ -85,22 +72,22 @@ func shell(fileName string) {
 				}
 			}
 
-			task := parse.Task{desc, dueTime, false}
-			taskList = append(taskList, task)
+			task := task.Todo{desc, false}
+
+			day := dayList.GetDay(dueTime)
+			day.Todos = append(day.Todos, task)
+
+			dayList = append(dayList, day)
 
 		case "p", "P", "print":
-			var currentDate time.Time
-
-			sort.Sort(taskList)
-
-			for _, task := range taskList {
-				if currentDate.YearDay() != task.DueTime.YearDay() || currentDate.Year() != task.DueTime.Year() {
-					fmt.Println()
-					currentDate = task.DueTime
-					dateString := currentDate.Format("01.02.06")
-					fmt.Println(dateString)
+			sort.Sort(dayList)
+			for _, day := range dayList {
+				fmt.Println()
+				dateString := day.Date.Format("01.02.06")
+				fmt.Println(dateString)
+				for _, todo := range day.Todos {
+					fmt.Println(todo.Description)
 				}
-				fmt.Println(task.Description)
 			}
 
 		case "q", "Q", "quit":
@@ -108,33 +95,35 @@ func shell(fileName string) {
 		}
 	}
 
-	saveToFile(taskList, fileName)
+	saveToFile(dayList, fileName)
 }
 
-func parseFromFile(fileName string) (list TaskList) {
+func parseFromFile(fileName string) (list task.DayList) {
 	file, error := os.OpenFile(fileName, os.O_RDONLY, 0600)
 	if error != nil {
-		panic(error)
+		//FIXME Write proper error message. Obviously we cannot open this file
+		return
+		//panic(error)
 
 	}
 	defer file.Close()
 
 	parser := parse.NewParser(file)
 
-	list = make(TaskList, 0, 10)
-	var task *parse.Task
+	list = make(task.DayList, 0, 10)
+	var day *task.Day
 	for {
-		task, error = parser.Parse()
+		day, error = parser.Parse()
 		if error != nil {
 			return
 		}
-		list = append(list, *task)
+		list = append(list, *day)
 	}
 
 	return list
 }
 
-func saveToFile(list TaskList, fileName string) {
+func saveToFile(list task.DayList, fileName string) {
 	file, error := os.OpenFile(fileName, os.O_WRONLY, 0600)
 	if error != nil {
 		panic(error)
@@ -143,16 +132,21 @@ func saveToFile(list TaskList, fileName string) {
 	defer file.Close()
 
 	sort.Sort(list)
-	for _, task := range list {
+
+	for _, taskDay := range list {
 		fmt.Println()
-		dateString := task.DueTime.Format("01.02.06")
+		dateString := taskDay.Date.Format("01.02.06")
+		file.WriteString("# " + dateString + "\n")
 
-		fmt.Println(task)
+		for _, todo := range taskDay.Todos {
 
-		if task.Complete {
-			file.WriteString("[X] " + task.Description + " {" + dateString + "}" + "\n")
-		} else {
-			file.WriteString("[ ] " + task.Description + " {" + dateString + "}" + "\n")
+			fmt.Println(todo)
+
+			if todo.Complete {
+				file.WriteString("[X] " + todo.Description+ "\n")
+			} else {
+				file.WriteString("[ ] " + todo.Description + "\n")
+			}
 		}
 	}
 }
