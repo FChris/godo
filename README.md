@@ -1,1 +1,3 @@
-An easy to use shell to manage a ToDo List
+A small go tool to manage my todo files
+
+Note: This is work in progress and is not usable yet
