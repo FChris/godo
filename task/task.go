@@ -1,7 +1,18 @@
 package task
 
-import "time"
+import (
+	"time"
+)
 
+type Day struct {
+	Date  time.Time
+	Todos []Todo
+}
+
+type Todo struct {
+	Description string
+	Complete    bool
+}
 
 type DayList []Day
 
@@ -28,9 +39,9 @@ func (t DayList) hasDate(date time.Time) bool {
 
 //getDay returns the day for the give date from the DayList or a newly initialized day
 //for the date if the list does not contain it yet
-func (t DayList) GetDay(date time.Time) Day {
+func (t DayList) DayByDate(date time.Time) Day {
 	for _, d := range t {
-		if date == d.Date {
+		if date.YearDay() == d.Date.YearDay() && date.Year() == d.Date.Year() {
 			return d
 		}
 	}
@@ -38,14 +49,21 @@ func (t DayList) GetDay(date time.Time) Day {
 	return Day{date, make([]Todo, 0, 1)}
 }
 
+//SetDay creates a new list which the original day of this date is replaced. If the list did not contain this day
+//yet it is simply appended
+func (t DayList) SetDay(day Day) DayList {
+	//TODO check if we can modify this method so we change it inplace
+	for i, d := range t {
+		if d.Date.Year() == day.Date.Year() && day.Date.YearDay() == day.Date.YearDay() {
 
-type Day struct {
-	Date  time.Time
-	Todos []Todo
-}
+			newList := append(t[:i], day)
+			if t.Len() > i+1 {
+				newList = append(newList, t[i+1:]...)
+			}
+			return newList
+		}
+	}
 
-type Todo struct {
-	Description string
-	Complete    bool
+	return append(t, day)
 }
 

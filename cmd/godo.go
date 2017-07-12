@@ -11,6 +11,7 @@ import (
 	"flag"
 	"github.com/fchris/godo/parse"
 	"github.com/fchris/godo/task"
+	"io"
 )
 
 var dayList task.DayList
@@ -19,6 +20,8 @@ func main() {
 
 	interactive := flag.Bool("interactive", false, "Trigger interactive mode")
 	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
+	add := flag.String("a", "", "Add Todo given in the format '# <Date> [ ] <Task Description>")
+	complete := flag.String("c", "", "Action which shall be executed")
 	flag.Parse()
 
 	fmt.Println(*fileName)
@@ -26,12 +29,22 @@ func main() {
 	dayList = parseFromFile(*fileName)
 	fmt.Println(dayList)
 
-	if *interactive {
-		shell(*fileName)
+	if *add != "" {
+		parseData(strings.NewReader(*add))
 	}
+
+	if *complete != "" {
+		//TODO implement
+	}
+
+	if *interactive {
+		shell()
+	}
+
+	save(dayList, *fileName)
 }
 
-func shell(fileName string) {
+func shell() {
 	run := true
 	for run {
 		fmt.Println("Enter action:")
@@ -74,10 +87,11 @@ func shell(fileName string) {
 
 			task := task.Todo{desc, false}
 
-			day := dayList.GetDay(dueTime)
+			day := dayList.DayByDate(dueTime)
+			fmt.Println(day)
 			day.Todos = append(day.Todos, task)
-
-			dayList = append(dayList, day)
+			fmt.Println(day)
+			dayList = dayList.SetDay(day)
 
 		case "p", "P", "print":
 			sort.Sort(dayList)
@@ -94,8 +108,6 @@ func shell(fileName string) {
 			run = false
 		}
 	}
-
-	saveToFile(dayList, fileName)
 }
 
 func parseFromFile(fileName string) (list task.DayList) {
@@ -104,16 +116,18 @@ func parseFromFile(fileName string) (list task.DayList) {
 		//FIXME Write proper error message. Obviously we cannot open this file
 		return
 		//panic(error)
-
 	}
 	defer file.Close()
 
-	parser := parse.NewParser(file)
+	return parseData(file)
+}
+
+func parseData(r io.Reader) (list task.DayList) {
+	parser := parse.NewParser(r)
 
 	list = make(task.DayList, 0, 10)
-	var day *task.Day
 	for {
-		day, error = parser.Parse()
+		day, error := parser.Parse()
 		if error != nil {
 			return
 		}
@@ -123,8 +137,8 @@ func parseFromFile(fileName string) (list task.DayList) {
 	return list
 }
 
-func saveToFile(list task.DayList, fileName string) {
-	file, error := os.OpenFile(fileName, os.O_WRONLY, 0600)
+func save(list task.DayList, fileName string) {
+	file, error := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
 	if error != nil {
 		panic(error)
 
@@ -143,10 +157,12 @@ func saveToFile(list task.DayList, fileName string) {
 			fmt.Println(todo)
 
 			if todo.Complete {
-				file.WriteString("[X] " + todo.Description+ "\n")
+				file.WriteString("[X] " + todo.Description)
 			} else {
-				file.WriteString("[ ] " + todo.Description + "\n")
+				file.WriteString("[ ] " + todo.Description)
 			}
+
+			file.WriteString("\n")
 		}
 	}
 }
