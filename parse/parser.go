@@ -47,7 +47,7 @@ func (p *Parser) unscan() { p.buf.n = 1 }
 func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	tok, lit = p.scan()
 	if tok == WS {
-		tok, lit = p.scan() //shouldn't we use scanIgnore whitespace again?
+		tok, lit = p.scanIgnoreWhitespace()
 	}
 
 	return
@@ -56,8 +56,13 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 func (p *Parser) Parse() (*task.Day, error) {
 	taskDay := &task.Day{} //What are we actually doing here?
 
-	if tok, lit := p.scanIgnoreWhitespace(); tok != HASHTAG {
+	tok, lit := p.scanIgnoreWhitespace()
+	if tok != HASHTAG && tok != EOF {
 		return nil, fmt.Errorf("found %q, expected #", lit)
+	}
+
+	if tok == EOF {
+		return nil, nil
 	}
 
 	var buf bytes.Buffer
@@ -71,7 +76,6 @@ func (p *Parser) Parse() (*task.Day, error) {
 
 		if tok == WS && buf.Len() > 0 {
 			dateString := strings.Trim(buf.String(), " ")
-			fmt.Println(dateString)
 			dueTime, err := time.Parse(Timeformat, dateString)
 			if err != nil {
 				return nil, err
@@ -116,12 +120,14 @@ func (p *Parser) Parse() (*task.Day, error) {
 			//Read a field
 			tok, lit := p.scan()
 
-			if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN && tok != EOF {
+			if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG{
+				fmt.Println(tok, " ", lit)
 				return nil, fmt.Errorf("found %q, expected field", lit)
 			}
 
-			if tok == EOF || tok == STATUS_OPEN {
+			if tok == EOF || tok == STATUS_OPEN || tok == HASHTAG {
 				p.s.unread()
+				p.unscan()
 				break
 			}
 

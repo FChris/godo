@@ -24,18 +24,25 @@ func main() {
 	complete := flag.String("c", "", "Action which shall be executed")
 	flag.Parse()
 
-	fmt.Println(*fileName)
-
 	dayList = parseFromFile(*fileName)
 	fmt.Println(dayList)
 
 	if *add != "" {
 		parsedDayList := parseData(strings.NewReader(*add))
-		for _, day := range dayList {
-			d := parsedDayList.DayByDate(day.Date)
-			day.Todos.Insert(d.Todos)
+		for _, newDay := range parsedDayList {
+			d := dayList.DayByDate(newDay.Date)
+			d.Todos = d.Todos.Insert(newDay.Todos)
+
+			if !dayList.HasDate(d.Date) {
+				dayList = append(dayList, d)
+				sort.Sort(dayList)
+			} else {
+				dayList = dayList.SetDay(d)
+			}
 		}
 	}
+
+	fmt.Println(dayList)
 
 	if *complete != "" {
 		//TODO implement
@@ -95,7 +102,7 @@ func addTask(reader bufio.Reader) error {
 
 	dueTime := time.Now()
 	if len(dateString) != 0 {
-		dueTime, err = time.Parse("01.02.06", dateString)
+		dueTime, err = time.Parse(parse.Timeformat, dateString)
 		if err != nil {
 			log.Fatal("Could not parse date")
 			return err
@@ -105,10 +112,15 @@ func addTask(reader bufio.Reader) error {
 	task := task.Todo{desc, false}
 
 	day := dayList.DayByDate(dueTime)
-	fmt.Println(day)
-	day.Todos = append(day.Todos, task)
-	fmt.Println(day)
-	dayList = dayList.SetDay(day)
+	day.Todos = day.Todos.InsertTodo(task)
+	if !dayList.HasDate(day.Date) {
+		dayList = append(dayList, day)
+		sort.Sort(dayList)
+	} else {
+		dayList.SetDay(day)
+	}
+
+	fmt.Println(dayList)
 
 	return nil
 }
@@ -118,7 +130,7 @@ func printDayList() {
 	for _, day := range dayList {
 		sort.Sort(day.Todos)
 		fmt.Println()
-		dateString := day.Date.Format("01.02.06")
+		dateString := day.Date.Format(parse.Timeformat)
 		fmt.Println(dateString)
 		for _, todo := range day.Todos {
 			fmt.Println(todo.Description)
@@ -145,8 +157,14 @@ func parseData(r io.Reader) (list task.DayList) {
 	for {
 		day, error := parser.Parse()
 		if error != nil {
-			return
+			fmt.Println(error)
+			return list
 		}
+
+		if day == nil {
+			break
+		}
+
 		list = append(list, *day)
 	}
 
@@ -165,7 +183,7 @@ func save(dayList task.DayList, fileName string) {
 
 	for _, day := range dayList {
 		sort.Sort(day.Todos)
-		dateString := day.Date.Format("01.02.06")
+		dateString := day.Date.Format(parse.Timeformat)
 		file.WriteString("# " + dateString + "\n")
 
 		for _, todo := range day.Todos {
