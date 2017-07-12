@@ -54,58 +54,70 @@ func shell() {
 
 		if err != nil {
 			log.Fatal("Could not read action")
-			return
+			continue
 		}
-
 		action = strings.Trim(action, "\n")
 
 		switch action {
 		case "a", "A", "add":
-			fmt.Println("What is the description:")
-			desc, err := reader.ReadString('\n')
-			desc = strings.Trim(desc, "\n")
+			err = addTask(*reader)
 			if err != nil {
-				log.Fatal("Could not read description")
-				return
-			}
-
-			fmt.Println("When is it due? Hit enter for today:")
-			dateString, err := reader.ReadString('\n')
-			dateString = strings.Trim(dateString, "\n")
-			if err != nil {
-				log.Fatal("Could not read due date")
 				continue
 			}
-
-			dueTime := time.Now()
-			if len(dateString) != 0 {
-				dueTime, err = time.Parse("01.02.06", dateString)
-				if err != nil {
-					log.Fatal("Could not parse date")
-				}
-			}
-
-			task := task.Todo{desc, false}
-
-			day := dayList.DayByDate(dueTime)
-			fmt.Println(day)
-			day.Todos = append(day.Todos, task)
-			fmt.Println(day)
-			dayList = dayList.SetDay(day)
-
 		case "p", "P", "print":
-			sort.Sort(dayList)
-			for _, day := range dayList {
-				fmt.Println()
-				dateString := day.Date.Format("01.02.06")
-				fmt.Println(dateString)
-				for _, todo := range day.Todos {
-					fmt.Println(todo.Description)
-				}
-			}
-
+			printDayList()
 		case "q", "Q", "quit":
 			run = false
+		}
+	}
+}
+
+func addTask(reader bufio.Reader) error {
+	fmt.Println("What is the description:")
+	desc, err := reader.ReadString('\n')
+	desc = strings.Trim(desc, "\n")
+	if err != nil {
+		log.Fatal("Could not read description")
+		return err
+	}
+
+	fmt.Println("When is it due? Hit enter for today:")
+	dateString, err := reader.ReadString('\n')
+	dateString = strings.Trim(dateString, "\n")
+	if err != nil {
+		log.Fatal("Could not read due date")
+		return err
+	}
+
+	dueTime := time.Now()
+	if len(dateString) != 0 {
+		dueTime, err = time.Parse("01.02.06", dateString)
+		if err != nil {
+			log.Fatal("Could not parse date")
+			return err
+		}
+	}
+
+	task := task.Todo{desc, false}
+
+	day := dayList.DayByDate(dueTime)
+	fmt.Println(day)
+	day.Todos = append(day.Todos, task)
+	fmt.Println(day)
+	dayList = dayList.SetDay(day)
+
+	return nil
+}
+
+func printDayList() {
+	sort.Sort(dayList)
+	for _, day := range dayList {
+		sort.Sort(day.Todos)
+		fmt.Println()
+		dateString := day.Date.Format("01.02.06")
+		fmt.Println(dateString)
+		for _, todo := range day.Todos {
+			fmt.Println(todo.Description)
 		}
 	}
 }
@@ -137,7 +149,7 @@ func parseData(r io.Reader) (list task.DayList) {
 	return list
 }
 
-func save(list task.DayList, fileName string) {
+func save(dayList task.DayList, fileName string) {
 	file, error := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
 	if error != nil {
 		panic(error)
@@ -145,16 +157,14 @@ func save(list task.DayList, fileName string) {
 	}
 	defer file.Close()
 
-	sort.Sort(list)
+	sort.Sort(dayList)
 
-	for _, taskDay := range list {
-		fmt.Println()
-		dateString := taskDay.Date.Format("01.02.06")
+	for _, day := range dayList {
+		sort.Sort(day.Todos)
+		dateString := day.Date.Format("01.02.06")
 		file.WriteString("# " + dateString + "\n")
 
-		for _, todo := range taskDay.Todos {
-
-			fmt.Println(todo)
+		for _, todo := range day.Todos {
 
 			if todo.Complete {
 				file.WriteString("[X] " + todo.Description)
