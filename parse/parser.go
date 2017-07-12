@@ -126,7 +126,7 @@ func (p *Parser) Parse() (*task.Day, error) {
 			buf.WriteString(lit)
 		}
 
-		task.Description = strings.Trim(buf.String(), " ")
+		task.Description = strings.Trim(buf.String(), " \n")
 		taskDay.Todos = append(taskDay.Todos, *task)
 	}
 }
