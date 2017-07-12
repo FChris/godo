@@ -67,8 +67,10 @@ func (p *Parser) Parse() (*task.Day, error) {
 			return nil, fmt.Errorf("found %q, expected field or dot", lit)
 		}
 
-		if tok == WS {
-			dueTime, err := time.Parse("01.02.06", buf.String())
+		if tok == WS && buf.Len() > 0 {
+			dateString := strings.Trim(buf.String(), " ")
+			fmt.Println(dateString)
+			dueTime, err := time.Parse("01.02.06", dateString)
 			if err != nil {
 				return nil, err
 			}
