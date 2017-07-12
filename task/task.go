@@ -2,17 +2,39 @@ package task
 
 import (
 	"time"
+	"strings"
 )
-
-type Day struct {
-	Date  time.Time
-	Todos []Todo
-}
 
 type Todo struct {
 	Description string
 	Complete    bool
 }
+
+type TodoList []Todo
+
+type Day struct {
+	Date  time.Time
+	Todos TodoList
+}
+
+func (t TodoList) Len() int {
+	return len(t)
+}
+
+func (t TodoList) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t TodoList) Less(i, j int) bool {
+	if t[i].Complete && !t[j].Complete {
+		return true
+	} else if !t[i].Complete && t[j].Complete {
+		return false
+	} else {
+		return strings.Compare(t[i].Description, t[j].Description) == -1
+	}
+}
+
 
 type DayList []Day
 
