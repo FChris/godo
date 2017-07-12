@@ -3,6 +3,7 @@ package task
 import (
 	"time"
 	"strings"
+	"sort"
 )
 
 type Todo struct {
@@ -25,6 +26,25 @@ func (t TodoList) Swap(i, j int) {
 	t[i], t[j] = t[j], t[i]
 }
 
+//SetTodo checks if a Todo is already in the todo list and if not adds it
+func (t TodoList) InsertTodo(td Todo) {
+	for _, todo := range t {
+		if strings.Compare(strings.ToLower(td.Description), strings.ToLower(todo.Description)) == 0{
+			return
+		}
+	}
+
+	newList := append(t, td)
+	sort.Sort(newList)
+	t = newList
+}
+
+func (t TodoList) Insert (tl TodoList) {
+	for _, todo := range tl {
+		t.InsertTodo(todo)
+	}
+}
+
 func (t TodoList) Less(i, j int) bool {
 	if t[i].Complete && !t[j].Complete {
 		return true
@@ -34,7 +54,6 @@ func (t TodoList) Less(i, j int) bool {
 		return strings.Compare(t[i].Description, t[j].Description) == -1
 	}
 }
-
 
 type DayList []Day
 
@@ -88,4 +107,3 @@ func (t DayList) SetDay(day Day) DayList {
 
 	return append(t, day)
 }
-

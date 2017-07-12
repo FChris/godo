@@ -30,7 +30,11 @@ func main() {
 	fmt.Println(dayList)
 
 	if *add != "" {
-		parseData(strings.NewReader(*add))
+		parsedDayList := parseData(strings.NewReader(*add))
+		for _, day := range dayList {
+			d := parsedDayList.DayByDate(day.Date)
+			day.Todos.Insert(d.Todos)
+		}
 	}
 
 	if *complete != "" {
