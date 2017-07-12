@@ -9,6 +9,8 @@ import (
 	"github.com/fchris/godo/task"
 )
 
+const Timeformat string = "02.01.06"
+
 type Parser struct {
 	s *Scanner
 	buf struct {
@@ -70,7 +72,7 @@ func (p *Parser) Parse() (*task.Day, error) {
 		if tok == WS && buf.Len() > 0 {
 			dateString := strings.Trim(buf.String(), " ")
 			fmt.Println(dateString)
-			dueTime, err := time.Parse("01.02.06", dateString)
+			dueTime, err := time.Parse(Timeformat, dateString)
 			if err != nil {
 				return nil, err
 			}
