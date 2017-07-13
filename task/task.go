@@ -28,8 +28,18 @@ func (t TodoList) Swap(i, j int) {
 
 //SetTodo checks if a Todo is already in the todo list and if not adds it
 func (t TodoList) InsertTodo(td Todo) TodoList{
-	for _, todo := range t {
-		if strings.Compare(strings.ToLower(td.Description), strings.ToLower(todo.Description)) == 0{
+	for i, todo := range t {
+		if strings.Compare(strings.ToLower(td.Description), strings.ToLower(todo.Description)) == 0 {
+
+			if td.Complete != todo.Complete {
+				newList := append(t[:i], td)
+				if i < len(t) -1 {
+					newList = append(newList, t[i+1:]...)
+				}
+
+				sort.Sort(newList)
+				return newList
+			}
 			return t
 		}
 	}

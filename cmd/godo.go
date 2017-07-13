@@ -22,15 +22,25 @@ const tomorrow string = "tomorrow"
 
 func main() {
 
-	interactive := flag.Bool("interactive", false, "Trigger interactive mode")
+	interactive := flag.Bool("i", false, "Trigger interactive mode")
 	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
 	add := flag.String("a", "", "Add Todo given in the format '# <Date> [ ] <Task Description>")
-	print := flag.String("p", "", "Prints all todos for the given time. "+
+	period := flag.String("d", "-", "Accepts a time which is used by print or complete." +
 		"E.g - for all, "+
 		"01.02.06 for the ones on this date, "+
-		"01.02.06-31.12.06 for all from the first to the second date ")
-	complete := flag.String("c", "", "Action which shall be executed")
+		"01.02.06-31.12.06 for all from the first to the second period ")
+
+	switchStatus := flag.Int("s", 0, "Accepts the number of the entry of which the status is completed.")
+	printDays := flag.Bool("p", false, "Prints all todos for the given time.")
 	flag.Parse()
+
+	fmt.Println(*interactive)
+	fmt.Println(*fileName)
+	fmt.Println(*add)
+	fmt.Println(*period)
+	fmt.Println(*printDays)
+	fmt.Println(*switchStatus)
+
 
 	dayList = parseFromFile(*fileName)
 
@@ -39,12 +49,12 @@ func main() {
 		addDayList(parsedDayList)
 	}
 
-	if *print != "" {
-		printDayList(dayListByPeriod(*print))
+	if *printDays {
+		printDayList(dayListByPeriod(*period))
 	}
 
-	if *complete != "" {
-		//TODO implement
+	if *switchStatus > 0 {
+		switchTodoStatus(dayListByPeriod(*period), *switchStatus)
 	}
 
 	if *interactive {
@@ -55,8 +65,8 @@ func main() {
 }
 
 func parseFromFile(fileName string) (list task.DayList) {
-	file, error := os.OpenFile(fileName, os.O_RDONLY, 0600)
-	if error != nil {
+	file, err := os.OpenFile(fileName, os.O_RDONLY, 0600)
+	if err != nil {
 		//FIXME Write proper error message. Obviously we cannot open this file
 		return
 		//panic(error)
@@ -71,9 +81,9 @@ func parseData(r io.Reader) (list task.DayList) {
 
 	list = make(task.DayList, 0, 10)
 	for {
-		day, error := parser.Parse()
-		if error != nil {
-			fmt.Println(error)
+		day, err := parser.Parse()
+		if err != nil {
+			fmt.Println(err)
 			return list
 		}
 
@@ -88,9 +98,9 @@ func parseData(r io.Reader) (list task.DayList) {
 }
 
 func save(dayList task.DayList, fileName string) {
-	file, error := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
-	if error != nil {
-		panic(error)
+	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		panic(err)
 
 	}
 	defer file.Close()
@@ -111,6 +121,21 @@ func save(dayList task.DayList, fileName string) {
 			}
 
 			file.WriteString("\n")
+		}
+	}
+}
+
+func switchTodoStatus(l task.DayList, id int) {
+	for i, day := range l {
+		for j, todo := range day.Todos {
+			if i+j+1 == id {
+				fmt.Println(todo)
+				todo.Complete = !todo.Complete
+				todos := day.Todos.InsertTodo(todo)
+				dayList = dayList.SetDay(task.Day{Date: day.Date, Todos:todos})
+				fmt.Println(dayList)
+				return
+			}
 		}
 	}
 }
@@ -191,7 +216,7 @@ func addTask(reader bufio.Reader) error {
 		}
 	}
 
-	todo := task.Todo{desc, false}
+	todo := task.Todo{Description: desc, Complete:false}
 
 	day := dayList.DayByDate(dueTime)
 	day.Todos = day.Todos.InsertTodo(todo)
@@ -237,8 +262,6 @@ func dayListByPeriod(period string) task.DayList {
 				panic(err)
 			}
 		}
-	} else {
-
 	}
 
 	fromDate = ignoreTime(fromDate)
@@ -265,6 +288,11 @@ func printDayList(list task.DayList) {
 		dateString := day.Date.Format(parse.Timeformat)
 		fmt.Println(dateString)
 		for _, todo := range day.Todos {
+			if todo.Complete {
+				fmt.Print("[X] ")
+			} else {
+				fmt.Print("[ ] ")
+			}
 			fmt.Println(todo.Description)
 		}
 	}
