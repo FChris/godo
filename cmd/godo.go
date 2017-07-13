@@ -29,17 +29,7 @@ func main() {
 
 	if *add != "" {
 		parsedDayList := parseData(strings.NewReader(*add))
-		for _, newDay := range parsedDayList {
-			d := dayList.DayByDate(newDay.Date)
-			d.Todos = d.Todos.Insert(newDay.Todos)
-
-			if !dayList.HasDate(d.Date) {
-				dayList = append(dayList, d)
-				sort.Sort(dayList)
-			} else {
-				dayList = dayList.SetDay(d)
-			}
-		}
+		addDayList(parsedDayList)
 	}
 
 	fmt.Println(dayList)
@@ -53,6 +43,19 @@ func main() {
 	}
 
 	save(dayList, *fileName)
+}
+func addDayList(list task.DayList) {
+	for _, newDay := range list {
+		d := dayList.DayByDate(newDay.Date)
+		d.Todos = d.Todos.Insert(newDay.Todos)
+
+		if !dayList.HasDate(d.Date) {
+			dayList = append(dayList, d)
+			sort.Sort(dayList)
+		} else {
+			dayList = dayList.SetDay(d)
+		}
+	}
 }
 
 func shell() {
@@ -109,16 +112,12 @@ func addTask(reader bufio.Reader) error {
 		}
 	}
 
-	task := task.Todo{desc, false}
+	todo := task.Todo{desc, false}
 
 	day := dayList.DayByDate(dueTime)
-	day.Todos = day.Todos.InsertTodo(task)
-	if !dayList.HasDate(day.Date) {
-		dayList = append(dayList, day)
-		sort.Sort(dayList)
-	} else {
-		dayList.SetDay(day)
-	}
+	day.Todos = day.Todos.InsertTodo(todo)
+	insertList := task.DayList{day}
+	addDayList(insertList)
 
 	fmt.Println(dayList)
 
