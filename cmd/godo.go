@@ -44,6 +44,68 @@ func main() {
 
 	save(dayList, *fileName)
 }
+
+func parseFromFile(fileName string) (list task.DayList) {
+	file, error := os.OpenFile(fileName, os.O_RDONLY, 0600)
+	if error != nil {
+		//FIXME Write proper error message. Obviously we cannot open this file
+		return
+		//panic(error)
+	}
+	defer file.Close()
+
+	return parseData(file)
+}
+
+func parseData(r io.Reader) (list task.DayList) {
+	parser := parse.NewParser(r)
+
+	list = make(task.DayList, 0, 10)
+	for {
+		day, error := parser.Parse()
+		if error != nil {
+			fmt.Println(error)
+			return list
+		}
+
+		if day == nil {
+			break
+		}
+
+		list = append(list, *day)
+	}
+
+	return list
+}
+
+func save(dayList task.DayList, fileName string) {
+	file, error := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
+	if error != nil {
+		panic(error)
+
+	}
+	defer file.Close()
+
+	sort.Sort(dayList)
+
+	for _, day := range dayList {
+		sort.Sort(day.Todos)
+		dateString := day.Date.Format(parse.Timeformat)
+		file.WriteString("# " + dateString + "\n")
+
+		for _, todo := range day.Todos {
+
+			if todo.Complete {
+				file.WriteString("[X] " + todo.Description)
+			} else {
+				file.WriteString("[ ] " + todo.Description)
+			}
+
+			file.WriteString("\n")
+		}
+	}
+}
+
 func addDayList(list task.DayList) {
 	for _, newDay := range list {
 		d := dayList.DayByDate(newDay.Date)
@@ -137,63 +199,3 @@ func printDayList() {
 	}
 }
 
-func parseFromFile(fileName string) (list task.DayList) {
-	file, error := os.OpenFile(fileName, os.O_RDONLY, 0600)
-	if error != nil {
-		//FIXME Write proper error message. Obviously we cannot open this file
-		return
-		//panic(error)
-	}
-	defer file.Close()
-
-	return parseData(file)
-}
-
-func parseData(r io.Reader) (list task.DayList) {
-	parser := parse.NewParser(r)
-
-	list = make(task.DayList, 0, 10)
-	for {
-		day, error := parser.Parse()
-		if error != nil {
-			fmt.Println(error)
-			return list
-		}
-
-		if day == nil {
-			break
-		}
-
-		list = append(list, *day)
-	}
-
-	return list
-}
-
-func save(dayList task.DayList, fileName string) {
-	file, error := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
-	if error != nil {
-		panic(error)
-
-	}
-	defer file.Close()
-
-	sort.Sort(dayList)
-
-	for _, day := range dayList {
-		sort.Sort(day.Todos)
-		dateString := day.Date.Format(parse.Timeformat)
-		file.WriteString("# " + dateString + "\n")
-
-		for _, todo := range day.Todos {
-
-			if todo.Complete {
-				file.WriteString("[X] " + todo.Description)
-			} else {
-				file.WriteString("[ ] " + todo.Description)
-			}
-
-			file.WriteString("\n")
-		}
-	}
-}
