@@ -16,23 +16,32 @@ import (
 
 var dayList task.DayList
 
+const yesterday string = "yesterday"
+const today string = "today"
+const tomorrow string = "tomorrow"
+
 func main() {
 
 	interactive := flag.Bool("interactive", false, "Trigger interactive mode")
 	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
 	add := flag.String("a", "", "Add Todo given in the format '# <Date> [ ] <Task Description>")
+	print := flag.String("p", "", "Prints all todos for the given time. "+
+		"E.g - for all, "+
+		"01.02.06 for the ones on this date, "+
+		"01.02.06-31.12.06 for all from the first to the second date ")
 	complete := flag.String("c", "", "Action which shall be executed")
 	flag.Parse()
 
 	dayList = parseFromFile(*fileName)
-	fmt.Println(dayList)
 
 	if *add != "" {
 		parsedDayList := parseData(strings.NewReader(*add))
 		addDayList(parsedDayList)
 	}
 
-	fmt.Println(dayList)
+	if *print != "" {
+		printDayList(dayListByPeriod(*print))
+	}
 
 	if *complete != "" {
 		//TODO implement
@@ -91,7 +100,7 @@ func save(dayList task.DayList, fileName string) {
 	for _, day := range dayList {
 		sort.Sort(day.Todos)
 		dateString := day.Date.Format(parse.Timeformat)
-		file.WriteString("# " + dateString + "\n")
+		file.WriteString("\n# " + dateString + "\n\n")
 
 		for _, todo := range day.Todos {
 
@@ -141,7 +150,15 @@ func shell() {
 				continue
 			}
 		case "p", "P", "print":
-			printDayList()
+			fmt.Println("What time period do you want to print?")
+			period, err := reader.ReadString('\n')
+			period = strings.Trim(period, "\n")
+			if err != nil {
+				fmt.Println("Could not read time period")
+				continue
+			}
+
+			printDayList(dayListByPeriod(period))
 		case "q", "Q", "quit":
 			run = false
 		}
@@ -186,10 +203,64 @@ func addTask(reader bufio.Reader) error {
 	return nil
 }
 
-func printDayList() {
+func dayListByPeriod(period string) task.DayList {
+	dayDescription := strings.ToLower(period)
+	var fromDate time.Time
+	var toDate time.Time
+
+	if dayDescription == yesterday || dayDescription == today || dayDescription == tomorrow {
+		switch dayDescription {
+		case yesterday:
+			fromDate = time.Now().AddDate(0, 0, -1)
+		case today:
+			fromDate = time.Now()
+		case tomorrow:
+			fromDate = time.Now().AddDate(0, 0, 1)
+		}
+
+		toDate = fromDate
+	} else if strings.IndexRune(period, '-') >= 0 {
+		var err error
+		timeFrame := strings.Split(period, "-")
+		timeFrame = deleteEmpty(timeFrame)
+
+		if len(timeFrame) == 0 {
+			toDate = time.Now().AddDate(100, 0, 0)
+		} else if len(timeFrame) > 0 {
+			fromDate, err = time.Parse(parse.Timeformat, timeFrame[0])
+			if err != nil {
+				panic(err)
+			}
+		} else if len(timeFrame) > 1 {
+			toDate, err = time.Parse(parse.Timeformat, timeFrame[1])
+			if err != nil {
+				panic(err)
+			}
+		}
+	} else {
+
+	}
+
+	fromDate = ignoreTime(fromDate)
+	toDate = ignoreTime(toDate)
+
 	sort.Sort(dayList)
+
+	fmt.Println(dayList)
+
+	var periodDayList task.DayList
 	for _, day := range dayList {
-		sort.Sort(day.Todos)
+
+		if inTimeSpan(fromDate, toDate, day.Date) {
+			periodDayList = append(periodDayList, day)
+		}
+	}
+
+	return periodDayList
+}
+
+func printDayList(list task.DayList) {
+	for _, day := range list {
 		fmt.Println()
 		dateString := day.Date.Format(parse.Timeformat)
 		fmt.Println(dateString)
@@ -199,3 +270,23 @@ func printDayList() {
 	}
 }
 
+func inTimeSpan(from, to, check time.Time) bool {
+	return (check.After(from) && check.Before(to)) || check == to || check == from
+}
+
+func ignoreTime(date time.Time) time.Time {
+	var res time.Time
+	res = time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, time.UTC)
+
+	return res
+}
+
+func deleteEmpty(s []string) []string {
+	var r []string
+	for _, str := range s {
+		if str != "" {
+			r = append(r, str)
+		}
+	}
+	return r
+}
