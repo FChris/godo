@@ -1,9 +1,7 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"time"
 	"strings"
@@ -16,37 +14,31 @@ import (
 
 var dayList task.DayList
 
-const yesterday string = "yesterday"
-const today string = "today"
-const tomorrow string = "tomorrow"
+const (
+	yesterday string = "yesterday"
+	today     string = "today"
+	tomorrow  string = "tomorrow"
+)
 
 func main() {
 
-	interactive := flag.Bool("i", false, "Trigger interactive mode")
 	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
-	add := flag.String("a", "", "Add Todo given in the format '# <Date> [ ] <Task Description>")
-	period := flag.String("d", "-", "Accepts a time which is used by print or complete." +
+	add := flag.String("a", "", "Add the given text as a todo. Needs to be combined with the d flag")
+	period := flag.String("d", "-", "Accepts a time which is used by print or complete or add. " +
+		"Add requires a specific date while print and switch can work with time periods."+
 		"E.g - for all, "+
 		"01.02.06 for the ones on this date, "+
-		"01.02.06-31.12.06 for all from the first to the second period ")
+		"01.02.06-31.12.06 for all from the first to the second period " +
+		"yesterday, today, tomorrow")
 
 	switchStatus := flag.Int("s", 0, "Accepts the number of the entry of which the status is completed.")
 	printDays := flag.Bool("p", false, "Prints all todos for the given time.")
 	flag.Parse()
 
-	fmt.Println(*interactive)
-	fmt.Println(*fileName)
-	fmt.Println(*add)
-	fmt.Println(*period)
-	fmt.Println(*printDays)
-	fmt.Println(*switchStatus)
-
-
 	dayList = parseFromFile(*fileName)
 
 	if *add != "" {
-		parsedDayList := parseData(strings.NewReader(*add))
-		addDayList(parsedDayList)
+		addTodoFromDesc(*add, *period)
 	}
 
 	if *printDays {
@@ -57,10 +49,6 @@ func main() {
 		switchTodoStatus(dayListByPeriod(*period), *switchStatus)
 	}
 
-	if *interactive {
-		shell()
-	}
-
 	save(dayList, *fileName)
 }
 
@@ -69,7 +57,6 @@ func parseFromFile(fileName string) (list task.DayList) {
 	if err != nil {
 		//FIXME Write proper error message. Obviously we cannot open this file
 		return
-		//panic(error)
 	}
 	defer file.Close()
 
@@ -125,6 +112,25 @@ func save(dayList task.DayList, fileName string) {
 	}
 }
 
+func addTodoFromDesc(desc string, date string) {
+	var d time.Time
+	var err error
+	if isRelativeDayDescription(date) {
+		d = dateByRelativeDayDescription(date)
+	} else {
+		d, err = time.Parse(parse.Timeformat, date)
+		if err != nil {
+			//Todo error message
+			panic(err)
+		}
+	}
+
+	todoString := "# " + d.Format(parse.Timeformat) +" [ ] " + desc
+
+	parsedDayList := parseData(strings.NewReader(todoString))
+	addDayList(parsedDayList)
+}
+
 func switchTodoStatus(l task.DayList, id int) {
 	for i, day := range l {
 		for j, todo := range day.Todos {
@@ -132,7 +138,7 @@ func switchTodoStatus(l task.DayList, id int) {
 				fmt.Println(todo)
 				todo.Complete = !todo.Complete
 				todos := day.Todos.InsertTodo(todo)
-				dayList = dayList.SetDay(task.Day{Date: day.Date, Todos:todos})
+				dayList = dayList.SetDay(task.Day{Date: day.Date, Todos: todos})
 				fmt.Println(dayList)
 				return
 			}
@@ -154,95 +160,13 @@ func addDayList(list task.DayList) {
 	}
 }
 
-func shell() {
-	run := true
-	for run {
-		fmt.Println("Enter action:")
-
-		reader := bufio.NewReader(os.Stdin)
-		action, err := reader.ReadString('\n')
-
-		if err != nil {
-			log.Fatal("Could not read action")
-			continue
-		}
-		action = strings.Trim(action, "\n")
-
-		switch action {
-		case "a", "A", "add":
-			err = addTask(*reader)
-			if err != nil {
-				continue
-			}
-		case "p", "P", "print":
-			fmt.Println("What time period do you want to print?")
-			period, err := reader.ReadString('\n')
-			period = strings.Trim(period, "\n")
-			if err != nil {
-				fmt.Println("Could not read time period")
-				continue
-			}
-
-			printDayList(dayListByPeriod(period))
-		case "q", "Q", "quit":
-			run = false
-		}
-	}
-}
-
-func addTask(reader bufio.Reader) error {
-	fmt.Println("What is the description:")
-	desc, err := reader.ReadString('\n')
-	desc = strings.Trim(desc, "\n")
-	if err != nil {
-		log.Fatal("Could not read description")
-		return err
-	}
-
-	fmt.Println("When is it due? Hit enter for today:")
-	dateString, err := reader.ReadString('\n')
-	dateString = strings.Trim(dateString, "\n")
-	if err != nil {
-		log.Fatal("Could not read due date")
-		return err
-	}
-
-	dueTime := time.Now()
-	if len(dateString) != 0 {
-		dueTime, err = time.Parse(parse.Timeformat, dateString)
-		if err != nil {
-			log.Fatal("Could not parse date")
-			return err
-		}
-	}
-
-	todo := task.Todo{Description: desc, Complete:false}
-
-	day := dayList.DayByDate(dueTime)
-	day.Todos = day.Todos.InsertTodo(todo)
-	insertList := task.DayList{day}
-	addDayList(insertList)
-
-	fmt.Println(dayList)
-
-	return nil
-}
-
 func dayListByPeriod(period string) task.DayList {
 	dayDescription := strings.ToLower(period)
 	var fromDate time.Time
 	var toDate time.Time
 
-	if dayDescription == yesterday || dayDescription == today || dayDescription == tomorrow {
-		switch dayDescription {
-		case yesterday:
-			fromDate = time.Now().AddDate(0, 0, -1)
-		case today:
-			fromDate = time.Now()
-		case tomorrow:
-			fromDate = time.Now().AddDate(0, 0, 1)
-		}
-
+	if isRelativeDayDescription(dayDescription) {
+		fromDate = dateByRelativeDayDescription(dayDescription)
 		toDate = fromDate
 	} else if strings.IndexRune(period, '-') >= 0 {
 		var err error
@@ -280,6 +204,21 @@ func dayListByPeriod(period string) task.DayList {
 	}
 
 	return periodDayList
+}
+func dateByRelativeDayDescription(dayDescription string) time.Time {
+	var date time.Time
+	switch dayDescription {
+	case yesterday:
+		date = time.Now().AddDate(0, 0, -1)
+	case today:
+		date = time.Now()
+	case tomorrow:
+		date = time.Now().AddDate(0, 0, 1)
+	}
+	return date
+}
+func isRelativeDayDescription(dayDescription string) bool {
+	return dayDescription == yesterday || dayDescription == today || dayDescription == tomorrow
 }
 
 func printDayList(list task.DayList) {
