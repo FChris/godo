@@ -66,7 +66,6 @@ func parseFromFile(fileName string) (list task.DayList) {
 func parseData(r io.Reader) (list task.DayList) {
 	parser := parse.NewParser(r)
 
-	list = make(task.DayList, 0, 10)
 	for {
 		day, err := parser.Parse()
 		if err != nil {
@@ -78,7 +77,7 @@ func parseData(r io.Reader) (list task.DayList) {
 			break
 		}
 
-		list = append(list, *day)
+		list.SetDay(*day)
 	}
 
 	return list
@@ -94,12 +93,12 @@ func save(dayList task.DayList, fileName string) {
 
 	sort.Sort(dayList)
 
-	for _, day := range dayList {
+	for _, day := range dayList.Elem {
 		sort.Sort(day.Todos)
 		dateString := day.Date.Format(parse.Timeformat)
 		file.WriteString("\n# " + dateString + "\n\n")
 
-		for _, todo := range day.Todos {
+		for _, todo := range day.Todos.Elem {
 
 			if todo.Complete {
 				file.WriteString("[X] " + todo.Description)
@@ -132,14 +131,11 @@ func addTodoFromDesc(desc string, date string) {
 }
 
 func switchTodoStatus(l task.DayList, id int) {
-	for i, day := range l {
-		for j, todo := range day.Todos {
+	for i, day := range l.Elem {
+		for j, todo := range day.Todos.Elem {
 			if i+j+1 == id {
-				fmt.Println(todo)
 				todo.Complete = !todo.Complete
-				todos := day.Todos.InsertTodo(todo)
-				dayList = dayList.SetDay(task.Day{Date: day.Date, Todos: todos})
-				fmt.Println(dayList)
+				day.Todos.InsertTodo(todo)
 				return
 			}
 		}
@@ -147,16 +143,10 @@ func switchTodoStatus(l task.DayList, id int) {
 }
 
 func addDayList(list task.DayList) {
-	for _, newDay := range list {
+	for _, newDay := range list.Elem {
 		d := dayList.DayByDate(newDay.Date)
-		d.Todos = d.Todos.Insert(newDay.Todos)
-
-		if !dayList.HasDate(d.Date) {
-			dayList = append(dayList, d)
-			sort.Sort(dayList)
-		} else {
-			dayList = dayList.SetDay(d)
-		}
+		d.Todos.Insert(newDay.Todos)
+		dayList.SetDay(d)
 	}
 }
 
@@ -193,13 +183,11 @@ func dayListByPeriod(period string) task.DayList {
 
 	sort.Sort(dayList)
 
-	fmt.Println(dayList)
-
 	var periodDayList task.DayList
-	for _, day := range dayList {
+	for _, day := range dayList.Elem {
 
 		if inTimeSpan(fromDate, toDate, day.Date) {
-			periodDayList = append(periodDayList, day)
+			periodDayList.SetDay(day)
 		}
 	}
 
@@ -222,11 +210,11 @@ func isRelativeDayDescription(dayDescription string) bool {
 }
 
 func printDayList(list task.DayList) {
-	for _, day := range list {
+	for _, day := range list.Elem {
 		fmt.Println()
 		dateString := day.Date.Format(parse.Timeformat)
 		fmt.Println(dateString)
-		for _, todo := range day.Todos {
+		for _, todo := range day.Todos.Elem {
 			if todo.Complete {
 				fmt.Print("[X] ")
 			} else {
