@@ -11,7 +11,9 @@ type Todo struct {
 	Complete    bool
 }
 
-type TodoList []Todo
+type TodoList struct {
+	Elem []Todo
+}
 
 type Day struct {
 	Date  time.Time
@@ -19,70 +21,69 @@ type Day struct {
 }
 
 func (t TodoList) Len() int {
-	return len(t)
+	return len(t.Elem)
 }
 
 func (t TodoList) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
+	t.Elem[i], t.Elem[j] = t.Elem[j], t.Elem[i]
 }
 
 //SetTodo checks if a Todo is already in the todo list and if not adds it
-func (t TodoList) InsertTodo(td Todo) TodoList{
-	for i, todo := range t {
+func (t TodoList) InsertTodo(td Todo) {
+	for i, todo := range t.Elem {
 		if strings.Compare(strings.ToLower(td.Description), strings.ToLower(todo.Description)) == 0 {
 
 			if td.Complete != todo.Complete {
-				newList := append(t[:i], td)
-				if i < len(t) -1 {
-					newList = append(newList, t[i+1:]...)
+				newList := append(t.Elem[:i], td)
+				if i < len(t.Elem)-1 {
+					newList = append(newList, t.Elem[i+1:]...)
 				}
 
-				sort.Sort(newList)
-				return newList
+				t.Elem = newList
 			}
-			return t
+		} else {
+			newList := append(t.Elem, td)
+			t.Elem = newList
 		}
 	}
 
-	newList := append(t, td)
-	sort.Sort(newList)
-	return newList
+	sort.Sort(t)
 }
 
-func (t TodoList) Insert (tl TodoList) TodoList {
-	for _, todo := range tl {
-		t = t.InsertTodo(todo)
+func (t TodoList) Insert(tl TodoList) {
+	for _, todo := range tl.Elem {
+		t.InsertTodo(todo)
 	}
-
-	return t
 }
 
 func (t TodoList) Less(i, j int) bool {
-	if t[i].Complete && !t[j].Complete {
+	if t.Elem[i].Complete && !t.Elem[j].Complete {
 		return true
-	} else if !t[i].Complete && t[j].Complete {
+	} else if !t.Elem[i].Complete && t.Elem[j].Complete {
 		return false
 	} else {
-		return strings.Compare(t[i].Description, t[j].Description) == -1
+		return strings.Compare(t.Elem[i].Description, t.Elem[j].Description) == -1
 	}
 }
 
-type DayList []Day
+type DayList struct {
+	Elem []Day
+}
 
 func (t DayList) Len() int {
-	return len(t)
+	return len(t.Elem)
 }
 
 func (t DayList) Swap(i, j int) {
-	t[i], t[j] = t[j], t[i]
+	t.Elem[i], t.Elem[j] = t.Elem[j], t.Elem[i]
 }
 
 func (t DayList) Less(i, j int) bool {
-	return t[i].Date.Before(t[j].Date)
+	return t.Elem[i].Date.Before(t.Elem[j].Date)
 }
 
 func (t DayList) HasDate(date time.Time) bool {
-	for _, d := range t {
+	for _, d := range t.Elem {
 		if date == d.Date {
 			return true
 		}
@@ -93,26 +94,26 @@ func (t DayList) HasDate(date time.Time) bool {
 //getDay returns the day for the give date from the DayList or a newly initialized day
 //for the date if the list does not contain it yet
 func (t DayList) DayByDate(date time.Time) Day {
-	for _, d := range t {
+	for _, d := range t.Elem {
 		if date.YearDay() == d.Date.YearDay() && date.Year() == d.Date.Year() {
 			return d
 		}
 	}
 
-	return Day{date, make([]Todo, 0, 1)}
+	return Day{date, TodoList{}}
 }
 
 //SetDay creates a new list which the original day of this date is replaced. If the list did not contain this day
 //yet it is simply appended
-func (t DayList) SetDay(day Day) DayList {
+func (t DayList) SetDay(day Day) {
 	//TODO check if we can modify this method so we change it inplace
-	var newList DayList
-	for _, d := range t {
+	var newList []Day
+	for _, d := range t.Elem {
 		if d.Date.Year() == day.Date.Year() && day.Date.YearDay() == day.Date.YearDay() {
 			d.Todos.Insert(day.Todos)
 		}
 		newList = append(newList, d)
 	}
 
-	return newList
+	t.Elem = newList
 }
