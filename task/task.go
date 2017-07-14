@@ -29,28 +29,18 @@ func (t TodoList) Swap(i, j int) {
 }
 
 //SetTodo checks if a Todo is already in the todo list and if not adds it
-func (t TodoList) InsertTodo(td Todo) {
-	for i, todo := range t.Elem {
-		if strings.Compare(strings.ToLower(td.Description), strings.ToLower(todo.Description)) == 0 {
-
-			if td.Complete != todo.Complete {
-				newList := append(t.Elem[:i], td)
-				if i < len(t.Elem)-1 {
-					newList = append(newList, t.Elem[i+1:]...)
-				}
-
-				t.Elem = newList
-			}
-		} else {
-			newList := append(t.Elem, td)
-			t.Elem = newList
+func (t *TodoList) InsertTodo(td Todo) {
+	for _, todo := range t.Elem {
+		if todo.Description == td.Description {
+			return
 		}
 	}
-
+	newList := append(t.Elem, td)
+	t.Elem = newList
 	sort.Sort(t)
 }
 
-func (t TodoList) Insert(tl TodoList) {
+func (t *TodoList) Insert(tl TodoList) {
 	for _, todo := range tl.Elem {
 		t.InsertTodo(todo)
 	}
@@ -105,14 +95,17 @@ func (t DayList) DayByDate(date time.Time) Day {
 
 //SetDay creates a new list which the original day of this date is replaced. If the list did not contain this day
 //yet it is simply appended
-func (t DayList) SetDay(day Day) {
-	//TODO check if we can modify this method so we change it inplace
+func (t *DayList) SetDay(day Day) {
 	var newList []Day
-	for _, d := range t.Elem {
-		if d.Date.Year() == day.Date.Year() && day.Date.YearDay() == day.Date.YearDay() {
-			d.Todos.Insert(day.Todos)
+	if t.HasDate(day.Date) {
+		for _, d := range t.Elem {
+			if d.Date.Year() == day.Date.Year() && day.Date.YearDay() == day.Date.YearDay() {
+				d.Todos.Insert(day.Todos)
+			}
+			newList = append(newList, d)
 		}
-		newList = append(newList, d)
+	} else {
+		newList = append(t.Elem, day)
 	}
 
 	t.Elem = newList
