@@ -89,7 +89,7 @@ func (p *Parser) Parse() (*task.Day, error) {
 	buf.Reset()
 
 	for {
-		task := &task.Todo{}
+		todo := &task.Todo{}
 
 		tok, lit := p.scanIgnoreWhitespace()
 		if tok == HASHTAG || tok == EOF {
@@ -104,9 +104,9 @@ func (p *Parser) Parse() (*task.Day, error) {
 			return nil, fmt.Errorf("found %q, expected WS or X", lit)
 		} else {
 			if tok == IDENT {
-				task.Complete = true
+				todo.Complete = true
 			} else {
-				task.Complete = false
+				todo.Complete = false
 			}
 		}
 
@@ -120,13 +120,18 @@ func (p *Parser) Parse() (*task.Day, error) {
 			//Read a field
 			tok, lit := p.scan()
 
-			if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG{
-				fmt.Println(tok, " ", lit)
+			if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG {
 				return nil, fmt.Errorf("found %q, expected field", lit)
 			}
 
-			if tok == EOF || tok == STATUS_OPEN || tok == HASHTAG {
-				p.s.unread()
+			if tok == EOF || tok == HASHTAG {
+				todo.Description = strings.Trim(buf.String(), " \n")
+				taskDay.Todos.InsertTodo(*todo)
+				p.unscan()
+				return taskDay, nil
+			}
+
+			if tok == STATUS_OPEN {
 				p.unscan()
 				break
 			}
@@ -134,7 +139,7 @@ func (p *Parser) Parse() (*task.Day, error) {
 			buf.WriteString(lit)
 		}
 
-		task.Description = strings.Trim(buf.String(), " \n")
-		taskDay.Todos = append(taskDay.Todos, *task)
+		todo.Description = strings.Trim(buf.String(), " \n")
+		taskDay.Todos.InsertTodo(*todo)
 	}
 }
