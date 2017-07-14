@@ -138,7 +138,12 @@ func isWhitespace(ch rune) bool {
 }
 
 func isLetter(ch rune) bool {
-	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')
+	return (ch >= 'a' && ch <= 'z') ||
+		(ch >= 'A' && ch <= 'Z') ||
+		ch == 'ä' || ch == 'Ö' ||
+		ch == 'ö' || ch == 'Ä' ||
+		ch == 'ü' || ch == 'Ü' ||
+		ch == 'ß'
 }
 
 func isDigit(ch rune) bool {
