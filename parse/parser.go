@@ -54,7 +54,7 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 }
 
 func (p *Parser) Parse() (*task.Day, error) {
-	taskDay := &task.Day{} //What are we actually doing here?
+	taskDay := &task.Day{}
 
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != HASHTAG && tok != EOF {
@@ -120,7 +120,7 @@ func (p *Parser) Parse() (*task.Day, error) {
 			//Read a field
 			tok, lit := p.scan()
 
-			if tok != WS && tok != IDENT && tok != DOT && tok != COMMA && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG {
+			if  !isDescriptionToken(tok) && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG {
 				return nil, fmt.Errorf("found %q, expected field", lit)
 			}
 
@@ -142,4 +142,20 @@ func (p *Parser) Parse() (*task.Day, error) {
 		todo.Description = strings.Trim(buf.String(), " \n")
 		taskDay.Todos.InsertTodo(*todo)
 	}
+}
+
+func isDescriptionToken(tok Token) bool {
+	return tok == WS ||
+		tok == IDENT ||
+		tok == DOT ||
+		tok == COMMA ||
+		tok == SLASH ||
+		tok == SEMICOLON ||
+		tok == COLON ||
+		tok == ASTERISK ||
+		tok == BRACKET ||
+		tok == CURRENCY_SIGN ||
+		tok == PARAGRAPH ||
+		tok == DASH ||
+		tok == UNDERSCORE
 }

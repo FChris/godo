@@ -15,17 +15,30 @@ const (
 	WS
 
 	//Literals
-	IDENT //todos and dates
+	IDENT  //todos and dates
 
 	//Key Symbols
-	STATUS_OPEN  //[
-	STATUS_CLOSE //]
+	STATUS_OPEN   //[
+	STATUS_CLOSE  //]
 
 	//Misc
-	ASTERISK //*
-	COMMA    //,
-	DOT      //.
-	HASHTAG  //#
+	SLASH          // /
+	SEMICOLON      // ;
+	COLON          // :
+	ASTERISK       // *
+	COMMA          // ,
+	DOT            // .
+	HASHTAG        // #
+	BRACKET        // ( )
+	CURRENCY_SIGN  // $ €
+	PARAGRAPH      // §
+	AMPERSAND      // &
+	EQUALS         // =
+	TILDE		   // ~
+	AT 			   // @
+	PERCENT		   // %
+	DASH		   // -
+	UNDERSCORE     // _
 )
 
 var eof = rune(0)
@@ -82,8 +95,42 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 		return COMMA, ","
 	case '.':
 		return DOT, "."
+	case ':':
+		return COLON, ":"
+	case ';':
+		return SEMICOLON, ";"
+	case '/':
+		return SLASH, "/"
 	case '*':
 		return ASTERISK, "*"
+	case '(':
+		fallthrough
+	case ')':
+		return BRACKET, string(ch)
+	case '~':
+		return TILDE, "~"
+	case '€':
+		fallthrough
+	case '$':
+		fallthrough
+	case '£':
+		fallthrough
+	case '¥':
+		return CURRENCY_SIGN, string(ch)
+	case '§':
+		return PARAGRAPH, "§"
+	case '&':
+		return AMPERSAND, "&"
+	case '=':
+		return EQUALS, "="
+	case '@':
+		return AT, "@"
+	case '%':
+		return PERCENT, "%"
+	case '-':
+		return DASH, "-"
+	case '_':
+		return UNDERSCORE, "_"
 	case eof:
 		return EOF, string(ch)
 	}
