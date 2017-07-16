@@ -77,7 +77,7 @@ func (t DayList) Swap(i, j int) {
 }
 
 func (t DayList) Less(i, j int) bool {
-	return t.Elem[i].Date.Before(t.Elem[j].Date)
+	return t.Elem[i].Date.After(t.Elem[j].Date)
 }
 
 func (t DayList) HasDate(date time.Time) bool {
