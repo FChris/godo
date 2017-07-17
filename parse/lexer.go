@@ -45,18 +45,18 @@ var eof = rune(0)
 
 //Scanner represents a lexical scanner
 type Scanner struct {
-	r *bufio.Reader
+	*bufio.Reader
 }
 
 //NewScanner returns a new instance of Scanner
 func NewScanner(r io.Reader) *Scanner {
-	return &Scanner{r: bufio.NewReader(r)}
+	return &Scanner{bufio.NewReader(r)}
 }
 
 //read reads the next rune from the buffered reader.
 //Returns the rune(0) if an error occurs(or io.EOF is returned).
 func (s *Scanner) read() rune {
-	r, _, err := s.r.ReadRune()
+	r, _, err := s.ReadRune()
 	if err != nil {
 		return eof
 	}
@@ -66,7 +66,7 @@ func (s *Scanner) read() rune {
 
 //unread places the previously read rune back to the reader
 func (s *Scanner) unread() {
-	s.r.UnreadRune()
+	s.UnreadRune()
 }
 
 //Scan returns the next token and its value
