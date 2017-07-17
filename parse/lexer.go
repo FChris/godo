@@ -44,18 +44,18 @@ const (
 var eof = rune(0)
 
 //Scanner represents a lexical scanner
-type Scanner struct {
+type scanner struct {
 	*bufio.Reader
 }
 
 //NewScanner returns a new instance of Scanner
-func NewScanner(r io.Reader) *Scanner {
-	return &Scanner{bufio.NewReader(r)}
+func NewScanner(r io.Reader) *scanner {
+	return &scanner{bufio.NewReader(r)}
 }
 
 //read reads the next rune from the buffered reader.
 //Returns the rune(0) if an error occurs(or io.EOF is returned).
-func (s *Scanner) read() rune {
+func (s *scanner) read() rune {
 	r, _, err := s.ReadRune()
 	if err != nil {
 		return eof
@@ -65,12 +65,12 @@ func (s *Scanner) read() rune {
 }
 
 //unread places the previously read rune back to the reader
-func (s *Scanner) unread() {
+func (s *scanner) unread() {
 	s.UnreadRune()
 }
 
 //Scan returns the next token and its value
-func (s *Scanner) Scan() (tok Token, lit string) {
+func (s *scanner) Scan() (tok Token, lit string) {
 	ch := s.read()
 
 	// If we see whitespace then consume all contiguous whitespace.
@@ -138,7 +138,7 @@ func (s *Scanner) Scan() (tok Token, lit string) {
 	return ILLEGAL_TOKEN, string(ch)
 }
 
-func (s *Scanner) scanWhitespace() (tok Token, lit string) {
+func (s *scanner) scanWhitespace() (tok Token, lit string) {
 	//Create buffer and read the current character into it
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
@@ -159,7 +159,7 @@ func (s *Scanner) scanWhitespace() (tok Token, lit string) {
 	return WS, buf.String()
 }
 
-func (s *Scanner) scanIdent() (tok Token, lit string) {
+func (s *scanner) scanIdent() (tok Token, lit string) {
 	var buf bytes.Buffer
 	buf.WriteRune(s.read())
 
