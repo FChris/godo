@@ -53,8 +53,8 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	return
 }
 
-func (p *Parser) Parse() (*task.Day, error) {
-	taskDay := &task.Day{}
+func (p *Parser) Parse() (task.Day, error) {
+	var	taskDay task.Day
 
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != HASHTAG && tok != EOF {
