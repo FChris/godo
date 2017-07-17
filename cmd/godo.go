@@ -70,17 +70,17 @@ func parseData(r io.Reader) (list task.DayList) {
 		day, err := parser.Parse()
 		if err != nil {
 			fmt.Println(err)
-			return list
+			return
 		}
 
-		if day == nil {
-			break
+		if day.Date.IsZero() {
+			return
 		}
 
-		list.SetDay(*day)
+		list.SetDay(day)
 	}
 
-	return list
+	return
 }
 
 func save(dayList task.DayList, fileName string) {
