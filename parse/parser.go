@@ -12,7 +12,7 @@ import (
 const Timeformat string = "02.01.06"
 
 type Parser struct {
-	s *Scanner
+	s *scanner
 	buf struct {
 		tok Token  //last read token
 		lit string //last string literal
@@ -53,16 +53,18 @@ func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
 	return
 }
 
+// Parse returns a the next task.Day struct that can be parsed from the input or an error if no new task.Day can be
+// parsed
 func (p *Parser) Parse() (task.Day, error) {
 	var	taskDay task.Day
 
 	tok, lit := p.scanIgnoreWhitespace()
 	if tok != HASHTAG && tok != EOF {
-		return nil, fmt.Errorf("found %q, expected #", lit)
+		return taskDay, fmt.Errorf("found %q, expected #", lit)
 	}
 
 	if tok == EOF {
-		return nil, nil
+		return taskDay, nil
 	}
 
 	var buf bytes.Buffer
@@ -71,14 +73,14 @@ func (p *Parser) Parse() (task.Day, error) {
 		tok, lit := p.scan()
 
 		if tok != IDENT && tok != DOT && tok != WS {
-			return nil, fmt.Errorf("found %q, expected field or dot", lit)
+			return taskDay, fmt.Errorf("found %q, expected field or dot", lit)
 		}
 
 		if tok == WS && buf.Len() > 0 {
 			dateString := strings.Trim(buf.String(), " ")
 			dueTime, err := time.Parse(Timeformat, dateString)
 			if err != nil {
-				return nil, err
+				return taskDay, err
 			}
 			taskDay.Date = dueTime
 			break
@@ -97,11 +99,11 @@ func (p *Parser) Parse() (task.Day, error) {
 		}
 
 		if tok != STATUS_OPEN {
-			return nil, fmt.Errorf("found %q, expected [", lit)
+			return taskDay, fmt.Errorf("found %q, expected [", lit)
 		}
 
 		if tok, lit := p.scan(); tok != WS && tok != IDENT {
-			return nil, fmt.Errorf("found %q, expected WS or X", lit)
+			return taskDay, fmt.Errorf("found %q, expected WS or X", lit)
 		} else {
 			if tok == IDENT {
 				todo.Complete = true
@@ -111,7 +113,7 @@ func (p *Parser) Parse() (task.Day, error) {
 		}
 
 		if tok, lit := p.scan(); tok != STATUS_CLOSE {
-			return nil, fmt.Errorf("found %q, expected ]", lit)
+			return taskDay, fmt.Errorf("found %q, expected ]", lit)
 		}
 
 		var buf bytes.Buffer
@@ -121,7 +123,7 @@ func (p *Parser) Parse() (task.Day, error) {
 			tok, lit := p.scan()
 
 			if  !isDescriptionToken(tok) && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG {
-				return nil, fmt.Errorf("found %q, expected field", lit)
+				return taskDay, fmt.Errorf("found %q, expected field", lit)
 			}
 
 			if tok == EOF || tok == HASHTAG {
