@@ -6,7 +6,7 @@ Note: This is work in progress and is not fully usable yet
 
 If you have your go enviroment set up already you can simply execute
 
-```go get github.com/fchris/godo```
+```go get github.com/fchris/godo/cmd```
 
 and run it by executing to 
 
