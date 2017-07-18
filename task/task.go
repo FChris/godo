@@ -112,9 +112,10 @@ func (t *DayList) SetDay(day Day) {
 	if t.HasDate(day.Date) {
 		for _, d := range *t {
 			if d.Date.Year() == day.Date.Year() && day.Date.YearDay() == d.Date.YearDay() {
-				d.Todos.Insert(day.Todos)
+				newList = append(newList, day)
+			} else {
+				newList = append(newList, d)
 			}
-			newList = append(newList, d)
 		}
 	} else {
 		newList = append(*t, day)

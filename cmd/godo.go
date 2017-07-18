@@ -23,7 +23,6 @@ const (
 func main() {
 
 	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
-	add := flag.String("a", "", "Add the given text as a todo. Needs to be combined with the d flag")
 	period := flag.String("d", "-", "Accepts a time which is used by print or complete or add. "+
 		"Add requires a specific date while print and switch can work with time periods."+
 		"E.g - for all, "+
@@ -31,8 +30,10 @@ func main() {
 		"01.02.06-31.12.06 for all from the first to the second period "+
 		"yesterday, today, tomorrow")
 
-	switchStatus := flag.Int("s", 0, "Accepts the number of the entry of which the status is completed.")
-	printDays := flag.Bool("p", false, "Prints all todos for the given time.")
+	add := flag.String("add", "", "Add the given text as a todo. Needs to be combined with the d flag")
+	switchStatus := flag.Int("switch", 0, "Accepts the number of the entry of which the status is completed.")
+	printDays := flag.Bool("print", false, "Prints all todos for the given time.")
+	delete := flag.Int("delete", 0, "Accepts the number of the entry which shall be deleted")
 	flag.Parse()
 
 	dayList = parseFromFile(*fileName)
@@ -47,6 +48,10 @@ func main() {
 
 	if *switchStatus > 0 {
 		switchTodoStatus(dayListByPeriod(*period), *switchStatus)
+	}
+
+	if *delete > 0 {
+		deleteTodo(dayListByPeriod(*period), *delete)
 	}
 
 	save(dayList, *fileName)
@@ -84,7 +89,20 @@ func parseData(r io.Reader) (list task.DayList) {
 }
 
 func save(dayList task.DayList, fileName string) {
+	//Delete old backup
+	err := os.Remove("." + fileName + ".bak")
+	if err != nil && !os.IsNotExist(err) {
+		panic(err)
+
+	}
+	//Backup old file by renaming and hiding it
+	err = os.Rename(fileName, "."+fileName+".bak")
+	if err != nil {
+		panic(err)
+
+	}
 	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
+
 	if err != nil {
 		panic(err)
 
@@ -136,10 +154,34 @@ func switchTodoStatus(l task.DayList, id int) {
 			if i+j+1 == id {
 				todo.Complete = !todo.Complete
 				day.Todos.InsertTodo(todo)
+
+				dayList.SetDay(day)
 				return
 			}
 		}
 	}
+}
+
+func deleteTodo(l task.DayList, id int) {
+	var newDay task.Day
+	for i, day := range l {
+		for j := range day.Todos {
+			if i+j+1 == id {
+				newDay.Date = day.Date
+			}
+		}
+	}
+
+	//Todo find more efficient way to do this instead of running through the whole list twice
+	for i, day := range l {
+		for j, todo := range day.Todos {
+			if i+j+1 != id && day.Date == newDay.Date {
+				newDay.Todos.InsertTodo(todo)
+			}
+		}
+	}
+
+	dayList.SetDay(newDay)
 }
 
 func addDayList(list task.DayList) {
@@ -154,12 +196,12 @@ func dayListByPeriod(period string) task.DayList {
 	dayDescription := strings.ToLower(period)
 	var fromDate time.Time
 	var toDate time.Time
+	var err error
 
 	if isRelativeDayDescription(dayDescription) {
 		fromDate = dateByRelativeDayDescription(dayDescription)
 		toDate = fromDate
 	} else if strings.IndexRune(period, '-') >= 0 {
-		var err error
 		timeFrame := strings.Split(period, "-")
 		timeFrame = deleteEmpty(timeFrame)
 
@@ -176,6 +218,12 @@ func dayListByPeriod(period string) task.DayList {
 				panic(err)
 			}
 		}
+	} else {
+		fromDate, err = time.Parse(parse.Timeformat, period)
+		if err != nil {
+			panic(err)
+		}
+		toDate = fromDate
 	}
 
 	fromDate = ignoreTime(fromDate)
