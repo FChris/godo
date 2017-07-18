@@ -1,15 +1,15 @@
 package main
 
 import (
-	"fmt"
-	"os"
-	"time"
-	"strings"
-	"sort"
 	"flag"
+	"fmt"
 	"github.com/fchris/godo/parse"
 	"github.com/fchris/godo/task"
 	"io"
+	"os"
+	"sort"
+	"strings"
+	"time"
 )
 
 var dayList task.DayList
@@ -24,11 +24,11 @@ func main() {
 
 	fileName := flag.String("f", "tasks.todo", "Filename to read from and write to")
 	add := flag.String("a", "", "Add the given text as a todo. Needs to be combined with the d flag")
-	period := flag.String("d", "-", "Accepts a time which is used by print or complete or add. " +
+	period := flag.String("d", "-", "Accepts a time which is used by print or complete or add. "+
 		"Add requires a specific date while print and switch can work with time periods."+
 		"E.g - for all, "+
 		"01.02.06 for the ones on this date, "+
-		"01.02.06-31.12.06 for all from the first to the second period " +
+		"01.02.06-31.12.06 for all from the first to the second period "+
 		"yesterday, today, tomorrow")
 
 	switchStatus := flag.Int("s", 0, "Accepts the number of the entry of which the status is completed.")
@@ -93,12 +93,12 @@ func save(dayList task.DayList, fileName string) {
 
 	sort.Sort(dayList)
 
-	for _, day := range dayList.Elem {
+	for _, day := range dayList {
 		sort.Sort(day.Todos)
 		dateString := day.Date.Format(parse.Timeformat)
 		file.WriteString("\n# " + dateString + "\n\n")
 
-		for _, todo := range day.Todos.Elem {
+		for _, todo := range day.Todos {
 
 			if todo.Complete {
 				file.WriteString("[X] " + todo.Description)
@@ -124,15 +124,15 @@ func addTodoFromDesc(desc string, date string) {
 		}
 	}
 
-	todoString := "# " + d.Format(parse.Timeformat) +" [ ] " + desc
+	todoString := "# " + d.Format(parse.Timeformat) + " [ ] " + desc
 
 	parsedDayList := parseData(strings.NewReader(todoString))
 	addDayList(parsedDayList)
 }
 
 func switchTodoStatus(l task.DayList, id int) {
-	for i, day := range l.Elem {
-		for j, todo := range day.Todos.Elem {
+	for i, day := range l {
+		for j, todo := range day.Todos {
 			if i+j+1 == id {
 				todo.Complete = !todo.Complete
 				day.Todos.InsertTodo(todo)
@@ -143,7 +143,7 @@ func switchTodoStatus(l task.DayList, id int) {
 }
 
 func addDayList(list task.DayList) {
-	for _, newDay := range list.Elem {
+	for _, newDay := range list {
 		d := dayList.DayByDate(newDay.Date)
 		d.Todos.Insert(newDay.Todos)
 		dayList.SetDay(d)
@@ -184,7 +184,7 @@ func dayListByPeriod(period string) task.DayList {
 	sort.Sort(dayList)
 
 	var periodDayList task.DayList
-	for _, day := range dayList.Elem {
+	for _, day := range dayList {
 
 		if inTimeSpan(fromDate, toDate, day.Date) {
 			periodDayList.SetDay(day)
@@ -210,11 +210,11 @@ func isRelativeDayDescription(dayDescription string) bool {
 }
 
 func printDayList(list task.DayList) {
-	for _, day := range list.Elem {
+	for _, day := range list {
 		fmt.Println()
 		dateString := day.Date.Format(parse.Timeformat)
 		fmt.Println(dateString)
-		for _, todo := range day.Todos.Elem {
+		for _, todo := range day.Todos {
 			if todo.Complete {
 				fmt.Print("[X] ")
 			} else {
