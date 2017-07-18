@@ -6,13 +6,17 @@ import (
 	"sort"
 )
 
+// Todo is the base type for all tasks we want to save
 type Todo struct {
 	Description string
 	Complete    bool
 }
 
+// TodoList is a simple list of Todos
 type TodoList []Todo
 
+// Day is composition of a date and a TodoList.
+// It is supposed to contain all todos for the given date.
 type Day struct {
 	Date  time.Time
 	Todos TodoList
@@ -37,7 +41,8 @@ func (t TodoList) Less(i, j int) bool {
 }
 
 
-//SetTodo checks if a Todo is already in the todo list and if not adds it
+//InsertTodo checks if a Todo is already in the todo list and if not adds it
+//In case the Todo is already in the list but has a different Complete Status, the todo will be overwritten
 func (t *TodoList) InsertTodo(td Todo) {
 	for i, todo := range *t {
 		if todo.Description == td.Description {
@@ -57,12 +62,14 @@ func (t *TodoList) InsertTodo(td Todo) {
 	sort.Sort(t)
 }
 
+// Insert inserts all Todos from the parameter TodoList into the list on which the method is called
 func (t *TodoList) Insert(tl TodoList) {
 	for _, todo := range tl {
 		t.InsertTodo(todo)
 	}
 }
 
+// DayList is a simple list of Days
 type DayList []Day
 
 func (t DayList) Len() int {
@@ -77,6 +84,7 @@ func (t DayList) Less(i, j int) bool {
 	return t[i].Date.After(t[j].Date)
 }
 
+// HasDate returns true if the DayList contains a date with the given date
 func (t DayList) HasDate(date time.Time) bool {
 	for _, d := range t{
 		if date == d.Date {

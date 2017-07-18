@@ -6,13 +6,14 @@ import (
 	"io"
 )
 
+//Token identifies the type of data that was read
 type Token int
 
 const (
 	//Special
-	ILLEGAL_TOKEN = iota
-	EOF
-	WS
+	ILLEGAL = iota //ILLEGAL represents anything that cannot be identified by any other token
+	EOF            //EOF represents the end of file token
+	WS             //WS identifies a whitespace
 
 	//Literals
 	IDENT  //todos and dates
@@ -135,7 +136,7 @@ func (s *scanner) Scan() (tok Token, lit string) {
 		return EOF, string(ch)
 	}
 
-	return ILLEGAL_TOKEN, string(ch)
+	return ILLEGAL, string(ch)
 }
 
 func (s *scanner) scanWhitespace() (tok Token, lit string) {
