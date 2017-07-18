@@ -12,7 +12,7 @@ func TestTodoList_InsertTodo(t *testing.T) {
 	todo := Todo{Description: "Test", Complete: false}
 	todoList.InsertTodo(todo)
 
-	expectedTodoList := TodoList{[]Todo{todo}}
+	expectedTodoList := TodoList{todo}
 
 	assert.Equal(
 		t,
@@ -32,10 +32,10 @@ func TestTodoList_Insert(t *testing.T) {
 	var todoList TodoList
 	todo1 := Todo{Description: "Test", Complete: false}
 	todo2 := Todo{Description: "Test1", Complete: true}
-	insertableList := TodoList{[]Todo{todo1, todo2}}
+	insertableList := TodoList{todo1, todo2}
 	todoList.Insert(insertableList)
 
-	expectedTodoList := TodoList{[]Todo{todo1, todo2}}
+	expectedTodoList := TodoList{todo1, todo2}
 
 	sort.Sort(expectedTodoList)
 	sort.Sort(todoList)
@@ -56,11 +56,11 @@ func TestDayList_HasDate(t *testing.T) {
 
 	todo1 := Todo{Description: "Test", Complete: false}
 	todo2 := Todo{Description: "Test1", Complete: true}
-	todoList := TodoList{[]Todo{todo1, todo2}}
+	todoList := TodoList{todo1, todo2}
 
 	day := Day{testDate1, todoList}
 
-	dayList := DayList{[]Day{day}}
+	dayList := DayList{day}
 
 	assert.True(
 		t,
@@ -74,7 +74,7 @@ func TestDayList_SetDay(t *testing.T) {
 
 	todo1 := Todo{Description: "Test", Complete: false}
 	todo2 := Todo{Description: "Test1", Complete: true}
-	todoList := TodoList{[]Todo{todo1, todo2}}
+	todoList := TodoList{todo1, todo2}
 
 	day := Day{testDate1, todoList}
 
@@ -88,14 +88,14 @@ func TestDayList_SetDay(t *testing.T) {
 
 	assert.Equal(
 		t,
-		DayList{Elem: []Day{day}},
+		DayList{day},
 		dayList,
 		"DayList does not contain day after SetDay has been called.")
 
 	dayList.SetDay(day)
 	assert.NotEqual(
 		t,
-		DayList{Elem: []Day{day, day}},
+		DayList{day, day},
 		dayList,
 		"DayList contains same day twice after calling SetDay multiple times for the same day")
 
@@ -104,7 +104,7 @@ func TestDayList_SetDay(t *testing.T) {
 	dayList.SetDay(day)
 	assert.Equal(
 		t,
-		DayList{Elem: []Day{day}},
+		DayList{day},
 		dayList,
 		"DayList does not contain updated day after inserting a new Todo into a day.")
 
