@@ -25,27 +25,8 @@ func NewParser(r io.Reader) *Parser {
 	return &Parser{s: NewScanner(r)}
 }
 
-func (p *Parser) scan() (tok Token, lit string) {
-	//if we have a token on the buffer, return it
-	if p.buf.n != 0 {
-		p.buf.n = 0
-		return p.buf.tok, p.buf.lit
-	}
-
-	//Otherwise read the next token from the scanner
-	tok, lit = p.s.Scan()
-
-	//Save it to the buffer in case we unscan later.
-	p.buf.tok, p.buf.lit = tok, lit
-
-	return
-}
-
-// unscan pushes the previously read token back onto the buffer.
-func (p *Parser) unscan() { p.buf.n = 1 }
-
 func (p *Parser) scanIgnoreWhitespace() (tok Token, lit string) {
-	tok, lit = p.scan()
+	tok, lit = p.s.Scan()
 	if tok == WS {
 		tok, lit = p.scanIgnoreWhitespace()
 	}
@@ -70,7 +51,7 @@ func (p *Parser) Parse() (task.Day, error) {
 	var buf bytes.Buffer
 	for {
 		//Read a field
-		tok, lit := p.scan()
+		tok, lit := p.s.Scan()
 
 		if tok != IDENT && tok != DOT && tok != WS {
 			return taskDay, fmt.Errorf("found %q, expected field or dot", lit)
@@ -102,7 +83,7 @@ func (p *Parser) Parse() (task.Day, error) {
 			return taskDay, fmt.Errorf("found %q, expected [", lit)
 		}
 
-		if tok, lit := p.scan(); tok != WS && tok != IDENT {
+		if tok, lit := p.s.Scan(); tok != WS && tok != IDENT {
 			return taskDay, fmt.Errorf("found %q, expected WS or X", lit)
 		} else {
 			if tok == IDENT {
@@ -112,7 +93,7 @@ func (p *Parser) Parse() (task.Day, error) {
 			}
 		}
 
-		if tok, lit := p.scan(); tok != STATUS_CLOSE {
+		if tok, lit := p.s.Scan(); tok != STATUS_CLOSE {
 			return taskDay, fmt.Errorf("found %q, expected ]", lit)
 		}
 
@@ -120,7 +101,7 @@ func (p *Parser) Parse() (task.Day, error) {
 
 		for {
 			//Read a field
-			tok, lit := p.scan()
+			tok, lit := p.s.Scan()
 
 			if  !isDescriptionToken(tok) && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG {
 				return taskDay, fmt.Errorf("found %q, expected field", lit)
@@ -129,12 +110,12 @@ func (p *Parser) Parse() (task.Day, error) {
 			if tok == EOF || tok == HASHTAG {
 				todo.Description = strings.Trim(buf.String(), " \n")
 				taskDay.Todos.InsertTodo(*todo)
-				p.unscan()
+				p.s.UnreadRune()
 				return taskDay, nil
 			}
 
 			if tok == STATUS_OPEN {
-				p.unscan()
+				p.s.UnreadRune()
 				break
 			}
 
