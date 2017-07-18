@@ -2,6 +2,29 @@ A small go tool to manage my todo files
 
 Note: This is work in progress and is not fully usable yet
 
+# Installation
+
+If you have your go enviroment set up already you can simply execute
+
+```go get github.com/fchris/godo```
+
+and run it by executing to 
+
+```go run $GOPATH/src/github.com/fchris/godo/cmd/godo.go ```
+
+Alternatively you can install it into your $GOBIN folder by navigating to 
+
+```$GOPATH/src/github.com/fchris/godo/```
+
+and executing 
+
+```go install cmd/godo.go```
+
+If your $GOBIN folder is part of your $PATH you can simply execute it as shown under Usage,
+otherwise you can execute it with $GOBIN/godo.
+
+In case you haven't set up go yet you can follow the instructions provided by the [official site](https://golang.org/doc/install)
+
 # Usage
 
 Godo works with a markdown like structure for Todo Lists.
