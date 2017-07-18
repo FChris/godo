@@ -1,9 +1,9 @@
 package task
 
 import (
-	"time"
-	"strings"
 	"sort"
+	"strings"
+	"time"
 )
 
 // Todo is the base type for all tasks we want to save
@@ -40,7 +40,6 @@ func (t TodoList) Less(i, j int) bool {
 	}
 }
 
-
 //InsertTodo checks if a Todo is already in the todo list and if not adds it
 //In case the Todo is already in the list but has a different Complete Status, the todo will be overwritten
 func (t *TodoList) InsertTodo(td Todo) {
@@ -48,7 +47,7 @@ func (t *TodoList) InsertTodo(td Todo) {
 		if todo.Description == td.Description {
 			if todo.Complete != td.Complete {
 				newList := append((*t)[:i], td)
-				if len(*t) - 1 > i {
+				if len(*t)-1 > i {
 					newList = append(newList, (*t)[i+1:]...)
 				}
 				*t = newList
@@ -86,7 +85,7 @@ func (t DayList) Less(i, j int) bool {
 
 // HasDate returns true if the DayList contains a date with the given date
 func (t DayList) HasDate(date time.Time) bool {
-	for _, d := range t{
+	for _, d := range t {
 		if date == d.Date {
 			return true
 		}
@@ -121,5 +120,5 @@ func (t *DayList) SetDay(day Day) {
 		newList = append(*t, day)
 	}
 
-	*t= newList
+	*t = newList
 }

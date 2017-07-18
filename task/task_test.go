@@ -2,8 +2,8 @@ package task
 
 import (
 	"github.com/stretchr/testify/assert"
-	"testing"
 	"sort"
+	"testing"
 	"time"
 )
 

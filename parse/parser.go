@@ -1,12 +1,12 @@
 package parse
 
 import (
-	"fmt"
-	"io"
-	"time"
 	"bytes"
-	"strings"
+	"fmt"
 	"github.com/fchris/godo/task"
+	"io"
+	"strings"
+	"time"
 )
 
 //Timeformat describes the format used to parse dates

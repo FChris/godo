@@ -1,11 +1,11 @@
 package parse
 
 import (
+	"github.com/fchris/godo/task"
 	"github.com/stretchr/testify/assert"
 	"strings"
-	"github.com/fchris/godo/task"
-	"time"
 	"testing"
+	"time"
 )
 
 func TestParseString(t *testing.T) {
@@ -44,7 +44,7 @@ func TestParseMultilineString(t *testing.T) {
 	assert.Equal(t, nil, err, "Error for parsing date is not nil")
 
 	testTodoList := task.TodoList{task.Todo{Description: "Test String", Complete: false},
-													task.Todo{Description: "Test String2", Complete:false}}
+		task.Todo{Description: "Test String2", Complete: false}}
 	testDay := task.Day{Date: testDate1, Todos: testTodoList}
 	assert.Equal(t, testDay, day, "Test Day does not equal actual parsed day")
 

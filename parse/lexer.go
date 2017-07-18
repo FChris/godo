@@ -16,30 +16,30 @@ const (
 	WS             //WS identifies a whitespace
 
 	//Literals
-	IDENT  //todos and dates
+	IDENT //todos and dates
 
 	//Key Symbols
-	STATUS_OPEN   //[
-	STATUS_CLOSE  //]
+	STATUS_OPEN  //[
+	STATUS_CLOSE //]
 
 	//Misc
-	SLASH          // /
-	SEMICOLON      // ;
-	COLON          // :
-	ASTERISK       // *
-	COMMA          // ,
-	DOT            // .
-	HASHTAG        // #
-	BRACKET        // ( )
-	CURRENCY_SIGN  // $ €
-	PARAGRAPH      // §
-	AMPERSAND      // &
-	EQUALS         // =
-	TILDE		   // ~
-	AT 			   // @
-	PERCENT		   // %
-	DASH		   // -
-	UNDERSCORE     // _
+	SLASH         // /
+	SEMICOLON     // ;
+	COLON         // :
+	ASTERISK      // *
+	COMMA         // ,
+	DOT           // .
+	HASHTAG       // #
+	BRACKET       // ( )
+	CURRENCY_SIGN // $ €
+	PARAGRAPH     // §
+	AMPERSAND     // &
+	EQUALS        // =
+	TILDE         // ~
+	AT            // @
+	PERCENT       // %
+	DASH          // -
+	UNDERSCORE    // _
 )
 
 var eof = rune(0)
