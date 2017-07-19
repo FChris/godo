@@ -71,7 +71,7 @@ suggested that you simply first print the list for a given date to find out the 
 
 # Contributing
 
-I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for ways to and contribute.
+I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for ways to contribute.
 
 # Further Work
 The tool will be expanded to provide edit, delete and re-date functionality and the code basis will have to be cleaned up.
