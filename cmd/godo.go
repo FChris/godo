@@ -51,15 +51,30 @@ func main() {
 	}
 
 	if *printDays {
-		printDayList(dayListByPeriod(*period))
+		list, err := dayListByPeriod(*period)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		printDayList(list)
 	}
 
 	if *switchStatus > 0 {
-		switchTodoStatus(dayListByPeriod(*period), *switchStatus)
+		list, err := dayListByPeriod(*period)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		switchTodoStatus(list, *switchStatus)
 	}
 
 	if *delete > 0 {
-		deleteTodo(dayListByPeriod(*period), *delete)
+		list, err := dayListByPeriod(*period)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		deleteTodo(list, *delete)
 	}
 
 	err = save(dayList, *fileName)
@@ -207,7 +222,7 @@ func addDayList(list task.DayList) {
 	}
 }
 
-func dayListByPeriod(period string) task.DayList {
+func dayListByPeriod(period string) (task.DayList, error) {
 	dayDescription := strings.ToLower(period)
 	var fromDate time.Time
 	var toDate time.Time
@@ -222,21 +237,24 @@ func dayListByPeriod(period string) task.DayList {
 
 		if len(timeFrame) == 0 {
 			toDate = time.Now().AddDate(100, 0, 0)
-		} else if len(timeFrame) > 0 {
-			fromDate, err = time.Parse(parse.Timeformat, timeFrame[0])
-			if err != nil {
-				panic(err)
-			}
 		} else if len(timeFrame) > 1 {
 			toDate, err = time.Parse(parse.Timeformat, timeFrame[1])
 			if err != nil {
-				panic(err)
+				err = fmt.Errorf("Error while parsing to date: %s", err)
+				return task.DayList{}, err
+			}
+		} else if len(timeFrame) > 0 {
+			fromDate, err = time.Parse(parse.Timeformat, timeFrame[0])
+			if err != nil {
+				err = fmt.Errorf("Error while parsing from date: %s", err)
+				return task.DayList{}, err
 			}
 		}
 	} else {
 		fromDate, err = time.Parse(parse.Timeformat, period)
 		if err != nil {
-			panic(err)
+			err = fmt.Errorf("Error while parsing from date: %s", err)
+			return task.DayList{}, err
 		}
 		toDate = fromDate
 	}
@@ -254,7 +272,7 @@ func dayListByPeriod(period string) task.DayList {
 		}
 	}
 
-	return periodDayList
+	return periodDayList, nil
 }
 func dateByRelativeDayDescription(dayDescription string) time.Time {
 	var date time.Time
