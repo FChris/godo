@@ -36,10 +36,18 @@ func main() {
 	delete := flag.Int("delete", 0, "Accepts the number of the entry which shall be deleted")
 	flag.Parse()
 
-	dayList = parseFromFile(*fileName)
+	dayList, err := parseFromFile(*fileName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	if *add != "" {
-		addTodoFromDesc(*add, *period)
+		err := addTodoFromDesc(*add, *period)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 	}
 
 	if *printDays {
@@ -54,27 +62,36 @@ func main() {
 		deleteTodo(dayListByPeriod(*period), *delete)
 	}
 
-	save(dayList, *fileName)
+	err = save(dayList, *fileName)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 }
 
-func parseFromFile(fileName string) (list task.DayList) {
+func parseFromFile(fileName string) (list task.DayList, err error) {
 	file, err := os.OpenFile(fileName, os.O_RDONLY, 0600)
 	if err != nil {
-		//FIXME Write proper error message. Obviously we cannot open this file
-		return
+		err = fmt.Errorf("Error while opening file: %s", err)
+		return list, err
+
 	}
 	defer file.Close()
 
-	return parseData(file)
+	list, err = parseData(file)
+	if err != nil {
+		err = fmt.Errorf("Parsing from file: %s", err)
+	}
+	return list, err
 }
 
-func parseData(r io.Reader) (list task.DayList) {
+func parseData(r io.Reader) (list task.DayList, err error) {
 	parser := parse.NewParser(r)
 
 	for {
-		day, err := parser.Parse()
-		if err != nil {
-			fmt.Println(err)
+		day, e := parser.Parse()
+		if e != nil {
+			err = fmt.Errorf("Error while parsing data: %s", e)
 			return
 		}
 
@@ -88,24 +105,20 @@ func parseData(r io.Reader) (list task.DayList) {
 	return
 }
 
-func save(dayList task.DayList, fileName string) {
-	//Delete old backup
+func save(dayList task.DayList, fileName string) error {
 	err := os.Remove("." + fileName + ".bak")
 	if err != nil && !os.IsNotExist(err) {
-		panic(err)
-
+		return fmt.Errorf("Error while deleting old backup: %s", err)
 	}
-	//Backup old file by renaming and hiding it
+
 	err = os.Rename(fileName, "."+fileName+".bak")
 	if err != nil {
-		panic(err)
-
+		return fmt.Errorf("Backing up existing todo list: %s", err)
 	}
+
 	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_CREATE, 0600)
-
 	if err != nil {
-		panic(err)
-
+		return fmt.Errorf("Error while opening file for writing : %s", err)
 	}
 	defer file.Close()
 
@@ -121,9 +134,11 @@ func save(dayList task.DayList, fileName string) {
 			file.WriteString("  \n")
 		}
 	}
+
+	return nil
 }
 
-func addTodoFromDesc(desc string, date string) {
+func addTodoFromDesc(desc string, date string) error {
 	var d time.Time
 	var err error
 	if isRelativeDayDescription(date) {
@@ -131,15 +146,21 @@ func addTodoFromDesc(desc string, date string) {
 	} else {
 		d, err = time.Parse(parse.Timeformat, date)
 		if err != nil {
-			//Todo error message
-			panic(err)
+			return err
 		}
 	}
 
 	todoString := "# " + d.Format(parse.Timeformat) + " [ ] " + desc
 
-	parsedDayList := parseData(strings.NewReader(todoString))
+	parsedDayList, err := parseData(strings.NewReader(todoString))
+
+	if err != nil {
+		err = fmt.Errorf("Parsing from description: %s", err)
+		return err
+	}
+
 	addDayList(parsedDayList)
+	return nil
 }
 
 func switchTodoStatus(l task.DayList, id int) {
