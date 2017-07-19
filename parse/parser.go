@@ -80,7 +80,7 @@ func (p *Parser) Parse() (task.Day, error) {
 			return taskDay, fmt.Errorf("found %q, expected [", lit)
 		}
 
-		if tok, lit := p.Scan(); tok != WS && tok != IDENT {
+		if tok, lit = p.Scan(); tok != WS && tok != IDENT {
 			return taskDay, fmt.Errorf("found %q, expected WS or X", lit)
 		}
 
