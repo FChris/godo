@@ -69,5 +69,9 @@ The id indicates the i-th Todo in the list you would see if you printed it. For 
 Todolists stay the same unless a status is switched (or in later versions the description changes). Therefor it is 
 suggested that you simply first print the list for a given date to find out the position of your todo and then switch the status.
 
+# Contributing
+
+I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for ways to and contribute.
+
 # Further Work
 The tool will be expanded to provide edit, delete and re-date functionality and the code basis will have to be cleaned up.
