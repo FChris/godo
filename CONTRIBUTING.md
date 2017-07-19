@@ -19,7 +19,7 @@ e-mail or just dive right into the code if you think some functionality is missi
 
 ### Before you get started
 
-Please also read the README.md and CODE_OF_CONDUCT.md before you get started so you have 
+Please also read the [README](https://github.com/FChris/godo/blob/master/README.md) and the [CODE OF CONDUCT](https://github.com/FChris/godo/blob/master/CODE_OF_CONDUCT.md) before you get started so you have 
 all the information I expect you to have.
 
 ### Submit a contribution
