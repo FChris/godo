@@ -1,8 +1,8 @@
+# godo - A small go tool to manage todo files
+
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
-A small go tool to manage my todo files
-
-# Background
+## Background
 
 This is work in progress, it may have some breaking changes until declared stable and probably does not provide all the functionality you might expect yet.  
 
@@ -19,7 +19,7 @@ Some of the features are already implemented, some of those still need some work
 Also the development and testing so far has only been done on Linux. So there might be issues on other systems. 
 If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Take a look at the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for that.
 
-# Installation
+## Installation
 
 If you have your go enviroment set up already, you can simply execute
 
@@ -42,7 +42,7 @@ otherwise you can execute it with `$GOBIN/godo`.
 
 In case you haven't set up go yet you can follow the instructions provided by the [official site](https://golang.org/doc/install)
 
-# Usage
+## Usage
 
 Godo works with a markdown like structure for Todo Lists.
 
@@ -84,9 +84,9 @@ The id indicates the i-th Todo in the list you would see if you printed it. For 
 Todolists stay the same unless a status is switched (or in later versions the description changes). Therefor it is 
 suggested that you simply first print the list for a given date to find out the position of your todo and then switch the status.
 
-# Contributing
+## Contributing
 
 I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for ways to contribute.
 
-# Further Work
+## Further Work
 The tool will be expanded to provide edit, delete and re-date functionality and the code basis will have to be cleaned up.
