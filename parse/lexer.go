@@ -65,11 +65,6 @@ func (s *scanner) read() rune {
 	return r
 }
 
-//unread places the previously read rune back to the reader
-func (s *scanner) unread() {
-	s.UnreadRune()
-}
-
 //Scan returns the next token and its value
 func (s *scanner) Scan() (tok Token, lit string) {
 	ch := s.read()
@@ -77,10 +72,10 @@ func (s *scanner) Scan() (tok Token, lit string) {
 	// If we see whitespace then consume all contiguous whitespace.
 	// If we see a letter then consume as an ident or reserved word.
 	if isWhitespace(ch) {
-		s.unread()
+		s.UnreadRune()
 		return s.scanWhitespace()
 	} else if isLetter(ch) || isDigit(ch) {
-		s.unread()
+		s.UnreadRune()
 		return s.scanIdent()
 	}
 
@@ -150,7 +145,7 @@ func (s *scanner) scanWhitespace() (tok Token, lit string) {
 		if ch := s.read(); ch == eof {
 			break
 		} else if !isWhitespace(ch) {
-			s.unread()
+			s.UnreadRune()
 			break
 		} else {
 			buf.WriteRune(ch)
@@ -171,7 +166,7 @@ func (s *scanner) scanIdent() (tok Token, lit string) {
 		if ch := s.read(); ch == eof {
 			break
 		} else if !isLetter(ch) && !isDigit(ch) {
-			s.unread()
+			s.UnreadRune()
 			break
 		} else {
 			buf.WriteRune(ch)
