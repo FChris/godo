@@ -34,7 +34,7 @@ func TestParseString(t *testing.T) {
 }
 
 func TestParseMultilineString(t *testing.T) {
-	p := NewParser(strings.NewReader("# 01.01.20 [ ] Test String\n" +
+	p := NewParser(strings.NewReader("# 01.01.20 [x] Test String\n" +
 		"[ ] Test String2 \n" +
 		"# 01.02.20 [ ] Test String2\n"))
 
@@ -43,7 +43,7 @@ func TestParseMultilineString(t *testing.T) {
 	testDate1, err := time.Parse(Timeformat, "01.01.20")
 	assert.Equal(t, nil, err, "Error for parsing date is not nil")
 
-	testTodoList := task.TodoList{task.Todo{Description: "Test String", Complete: false},
+	testTodoList := task.TodoList{task.Todo{Description: "Test String", Complete: true},
 		task.Todo{Description: "Test String2", Complete: false}}
 	testDay := task.Day{Date: testDate1, Todos: testTodoList}
 	assert.Equal(t, testDay, day, "Test Day does not equal actual parsed day")
