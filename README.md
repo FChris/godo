@@ -1,3 +1,5 @@
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+
 A small go tool to manage my todo files
 
 Note: This is work in progress and is not fully usable yet
