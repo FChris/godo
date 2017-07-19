@@ -6,7 +6,7 @@ A small go tool to manage my todo files
 
 This is work in progress, it may have some breaking changes until declared stable and probably does not provide all the functionality you might expect yet.  
 
-The main reason for developing this project instead of using [todo.txt] (http://todotxt.com/)was a matter of taste and a chance to learn the Go programming language. 
+The main reason for developing this project instead of using [todo.txt](http://todotxt.com/) was a matter of taste and a chance to learn the Go programming language. 
 
 The main goals for this tool are:
 * manage lists in a markdown like style
@@ -14,22 +14,22 @@ The main goals for this tool are:
 * view todo lists with text editor only
 * add todos without opening or navigating through existing todo lists
 
-Some of the features are already implemented, some of those stil need some work.
+Some of the features are already implemented, some of those still need some work.
 
-Also the development and testing so far has only been done on linux. So there might be issues on other systems. 
-If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Tkae a look at the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for that.
+Also the development and testing so far has only been done on Linux. So there might be issues on other systems. 
+If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Take a look at the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for that.
 
 # Installation
 
-If you have your go enviroment set up already you can simply execute
+If you have your go enviroment set up already, you can simply execute
 
 ```go get github.com/fchris/godo/cmd```
 
-and run it by executing to 
+and run it by executing
 
 ```go run $GOPATH/src/github.com/fchris/godo/cmd/godo.go ```
 
-Alternatively you can install it into your $GOBIN folder by navigating to 
+Alternatively, you can install it into your `$GOBIN` folder by navigating to 
 
 ```$GOPATH/src/github.com/fchris/godo/```
 
@@ -37,8 +37,8 @@ and executing
 
 ```go install cmd/godo.go```
 
-If your $GOBIN folder is part of your $PATH you can simply execute it as shown under Usage,
-otherwise you can execute it with $GOBIN/godo.
+If your `$GOBIN` folder is part of your `$PATH` you can simply execute it as shown in [Usage](#Usage),
+otherwise you can execute it with `$GOBIN/godo`.
 
 In case you haven't set up go yet you can follow the instructions provided by the [official site](https://golang.org/doc/install)
 
