@@ -4,7 +4,7 @@ A small go tool to manage my todo files
 
 # Background
 
-This is work in progress and does not provide all the functionality you might expect yet.  
+This is work in progress, it may have some breaking changes until declared stable and probably does not provide all the functionality you might expect yet.  
 
 The main reason for developing this project instead of using [todo.txt] (http://todotxt.com/)was a matter of taste and a chance to learn the Go programming language. 
 
