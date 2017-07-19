@@ -46,4 +46,18 @@ As a rule of thumb, changes are obvious fixes if they do not introduce any new f
 When writing your commit messages please try to stick to the guidelines given by 
 https://chris.beams.io/posts/git-commit/
 
+### How to report a bug 
+
+When filing an issue, make sure to answer these five questions:
+
+* What version of Go are you using (go version)?
+* What operating system and processor architecture are you using?
+* What did you do?
+* What did you expect to see?
+* What did you see instead? 
+
+### How to suggest a feature or enhancement
+
+If you find that a key feature is missing simply open an issue here on GitHub which describes
+what feature you would like to see, what the use case for the feature is and how it should work.
 
