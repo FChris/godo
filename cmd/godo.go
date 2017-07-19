@@ -117,14 +117,8 @@ func save(dayList task.DayList, fileName string) {
 		file.WriteString("\n# " + dateString + "\n\n")
 
 		for _, todo := range day.Todos {
-
-			if todo.Complete {
-				file.WriteString("[X] " + todo.Description)
-			} else {
-				file.WriteString("[ ] " + todo.Description)
-			}
-
-			file.WriteString("\n")
+			file.WriteString(todo.String())
+			file.WriteString("  \n")
 		}
 	}
 }
@@ -263,12 +257,7 @@ func printDayList(list task.DayList) {
 		dateString := day.Date.Format(parse.Timeformat)
 		fmt.Println(dateString)
 		for _, todo := range day.Todos {
-			if todo.Complete {
-				fmt.Print("[X] ")
-			} else {
-				fmt.Print("[ ] ")
-			}
-			fmt.Println(todo.Description)
+			fmt.Println(todo)
 		}
 	}
 }
