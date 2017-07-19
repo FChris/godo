@@ -2,7 +2,22 @@
 
 A small go tool to manage my todo files
 
-Note: This is work in progress and is not fully usable yet
+# Background
+
+This is work in progress and does not provide all the functionality you might expect yet.  
+
+The main reason for developing this project instead of using [todo.txt] (http://todotxt.com/)was a matter of taste and a chance to learn the Go programming language. 
+
+The main goals for this tool are:
+* manage lists in a markdown like style
+* be able to easily convert todo lists into printable pdf 
+* view todo lists with text editor only
+* add todos without opening or navigating through existing todo lists
+
+Some of the features are already implemented, some of those stil need some work.
+
+Also the development and testing so far has only been done on linux. So there might be issues on other systems. 
+If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Tkae a look at the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for that.
 
 # Installation
 
