@@ -6,7 +6,7 @@ contributing here put into this project. In return, you may expect that the same
 will be paid when addressing your issue, assessing your changes and 
 finalizing your pull request.
 
-As an open source project we am looking forward to contributions in whatever form they may come.
+As this is an open source project I am looking forward to contributions in whatever form they may come.
 Possible contributions can be code, tutorials, translations of the documents, bug reports or 
 even blog posts.
 
