@@ -41,6 +41,7 @@ As a rule of thumb, changes are obvious fixes if they do not introduce any new f
 - Changes to ‘metadata’ files like .gitignore, build scripts, etc.
 - Moving source files from one directory or package to another
 
+**Working on your first Pull Request?** You can learn how from this *free* series [How to Contribute to an Open Source Project on GitHub](https://egghead.io/series/how-to-contribute-to-an-open-source-project-on-github)
 
 ### Commit Messages
 When writing your commit messages please try to stick to the guidelines given by 
