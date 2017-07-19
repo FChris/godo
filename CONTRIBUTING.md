@@ -6,11 +6,11 @@ contributing here put into this project. In return, you may expect that the same
 will be paid when addressing your issue, assessing your changes and 
 finalizing your pull request.
 
-As an open source project I am looking forward to contributions in whatever form they may come.
+As an open source project we am looking forward to contributions in whatever form they may come.
 Possible contributions can be code, tutorials, translations of the documents, bug reports or 
 even blog posts.
 
-However if there are any support questions send me an e-mail to fraedric@fim.uni-passau.de 
+However if there are any support questions, send me an e-mail to fraedric@fim.uni-passau.de 
 instead of opening an issue. If the same questions comes up multiple times I will consider 
 add a FAQ section to the README
 
