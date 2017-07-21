@@ -33,7 +33,7 @@ func main() {
 	add := flag.String("add", "", "Add the given text as a todo. Needs to be combined with the d flag")
 	switchStatus := flag.Int("switch", 0, "Accepts the number of the entry of which the status is completed.")
 	printDays := flag.Bool("print", false, "Prints all todos for the given time.")
-	delete := flag.Int("delete", 0, "Accepts the number of the entry which shall be deleted")
+	del := flag.Int("delete", 0, "Accepts the number of the entry which shall be deleted")
 	flag.Parse()
 
 	dayList, err := parseFromFile(*fileName)
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	if *printDays {
-		list, err := dayListByPeriod(*period)
+		list, err := dayListByPeriod(dayList, *period)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -60,7 +60,7 @@ func main() {
 	}
 
 	if *switchStatus > 0 {
-		list, err := dayListByPeriod(*period)
+		list, err := dayListByPeriod(dayList, *period)
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -68,13 +68,13 @@ func main() {
 		switchTodoStatus(list, *switchStatus)
 	}
 
-	if *delete > 0 {
-		list, err := dayListByPeriod(*period)
+	if *del > 0 {
+		list, err := dayListByPeriod(dayList, *period)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		deleteTodo(list, *delete)
+		deleteTodo(list, *del)
 	}
 
 	err = save(dayList, *fileName)
@@ -222,7 +222,7 @@ func addDayList(list task.DayList) {
 	}
 }
 
-func dayListByPeriod(period string) (task.DayList, error) {
+func dayListByPeriod(dayList task.DayList, period string) (task.DayList, error) {
 	dayDescription := strings.ToLower(period)
 	var fromDate time.Time
 	var toDate time.Time
@@ -265,6 +265,7 @@ func dayListByPeriod(period string) (task.DayList, error) {
 	sort.Sort(dayList)
 
 	var periodDayList task.DayList
+	fmt.Println(dayList)
 	for _, day := range dayList {
 
 		if inTimeSpan(fromDate, toDate, day.Date) {
