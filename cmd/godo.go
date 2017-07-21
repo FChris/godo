@@ -265,7 +265,6 @@ func dayListByPeriod(dayList task.DayList, period string) (task.DayList, error) 
 	sort.Sort(dayList)
 
 	var periodDayList task.DayList
-	fmt.Println(dayList)
 	for _, day := range dayList {
 
 		if inTimeSpan(fromDate, toDate, day.Date) {
