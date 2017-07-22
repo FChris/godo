@@ -13,7 +13,7 @@ func main() {
 	app.Usage = "A small go tool to manage todo files"
 
 	app.Commands = []cli.Command{
-		printCommand(), addCommand(), switchStatusCommand(),
+		printCommand(), addCommand(), switchStatusCommand(), deleteCommand(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
