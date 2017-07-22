@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/fchris/godo/parse"
-	"github.com/fchris/godo/task"
+	"github.com/fchris/towg/parse"
+	"github.com/fchris/towg/task"
 	"io"
 	"os"
 	"sort"

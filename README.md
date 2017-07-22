@@ -1,4 +1,5 @@
-# godo - A small go tool to manage todo files
+# towg - Todos with Go
+## A small go tool to manage todo files
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 
@@ -17,28 +18,28 @@ The main goals for this tool are:
 Some of the features are already implemented, some of those still need some work.
 
 Also the development and testing so far has only been done on Linux. So there might be issues on other systems. 
-If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Take a look at the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for that.
+If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Take a look at the [contributing guidelines](https://github.com/FChris/towg/edit/master/CONTRIBUTING.md) for that.
 
 ## Installation
 
 If you have your go enviroment set up already, you can simply execute
 
-```go get github.com/fchris/godo/cmd```
+```go get github.com/fchris/towg/cmd```
 
 and run it by executing
 
-```go run $GOPATH/src/github.com/fchris/godo/cmd/godo.go ```
+```go run $GOPATH/src/github.com/fchris/towg/cmd/towg.go ```
 
 Alternatively, you can install it into your `$GOBIN` folder by navigating to 
 
-```$GOPATH/src/github.com/fchris/godo/```
+```$GOPATH/src/github.com/fchris/towg/```
 
 and executing 
 
-```go install cmd/godo.go```
+```go install cmd/towg.go```
 
 If your `$GOBIN` folder is part of your `$PATH` you can simply execute it as shown in [Usage](#Usage),
-otherwise you can execute it with `$GOBIN/godo`.
+otherwise you can execute it with `$GOBIN/towg`.
 
 In case you haven't set up go yet you can follow the instructions provided by the [official site](https://golang.org/doc/install)
 
@@ -65,31 +66,31 @@ An Example Todo file would look like this:
 - [ ] Todo 7
 ```
 
-Files are given to godo with the -f flag.
+Files are given to towg with the -f flag.
 
 If you want to print all Todos in the file you can use the print subcommand flag. For example:  
-  ``` godo print -f mytodolist.todo -d -```
+  ``` towg print -f mytodolist.todo -d -```
   
 If you want to print all Todos for a given day you can specify a date with -d. For example:  
-  ``` godo print -f mytodolist.todo -d 10.10.17```  
-  ``` godo print -f mytodolist.todo -d yesterday```  
-  ``` godo print -f mytodolist.todo -d today```  
-  ``` godo print -f mytodolist.todo -d tomorrow```  
+  ``` towg print -f mytodolist.todo -d 10.10.17```  
+  ``` towg print -f mytodolist.todo -d yesterday```  
+  ``` towg print -f mytodolist.todo -d today```  
+  ``` towg print -f mytodolist.todo -d tomorrow```  
 
 If you want to set a Todo to complete you have to use the -s flag and an id provided with -i:  
 The id indicates the i-th Todo in the list you would see if you printed it. For example:  
-   ```godo switch -f mytodolist.todo -n 5 ``` Switches the status of the 5th entry in the whole file.  
-   ```godo switch -f mytodolist.todo -n 4 -d today``` Switches the status of the 5th entry in the list for today.  
+   ```towg switch -f mytodolist.todo -n 5 ``` Switches the status of the 5th entry in the whole file.  
+   ```towg switch -f mytodolist.todo -n 4 -d today``` Switches the status of the 5th entry in the list for today.  
    
 Other subcommands are redate, delete and add. They work similarly the commands described above.
-You can get an info text for all commands by executing ```godo <command> -h```.  
+You can get an info text for all commands by executing ```towg <command> -h```.  
 
 Todolists stay the same unless a status is switched (or in later versions the description changes). Therefor it is 
 suggested that you simply first print the list for a given date to find out the position of your todo and then switch the status.
 
 ## Contributing
 
-I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for ways to contribute.
+I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/towg/edit/master/CONTRIBUTING.md/blob/master/CONTRIBUTING.md) for ways to contribute.
 
 ## Further Work
-* Also I am looking for a new name as godo is used already a lot in other projects.
+* Also I am looking for a new name as towg is used already a lot in other projects.

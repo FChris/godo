@@ -7,11 +7,11 @@ import (
 	"sort"
 )
 
-// RunCLI executes the Command Line Interface for GoDo
+// RunCLI executes the Command Line Interface for towg
 func RunCLI(messages chan string) {
 	app := cli.NewApp()
-	app.Name = "GoDo"
-	app.Usage = "A small go tool to manage todo files"
+	app.Name = "towg"
+	app.Usage = "Todos with go - A small go tool to manage todo files"
 	app.Version = "0.0.1"
 
 	app.Commands = []cli.Command{

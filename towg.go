@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fchris/godo/cmd"
+	"github.com/fchris/towg/cmd"
 )
 
 func main() {
