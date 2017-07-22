@@ -29,7 +29,11 @@ func printCommand() cli.Command {
 		Usage: "print all tasks for a time period",
 		Flags: []cli.Flag{fileFlag(), dateFlag()},
 		Action: func(c *cli.Context) error {
-			list, err := parseFromFile(c.String("file"))
+			fileName := c.String("file")
+			if fileName == "" {
+				fileName = fileNameDefault
+			}
+			list, err := parseFromFile(fileName)
 			if err != nil {
 				return err
 			}
@@ -65,7 +69,7 @@ func addCommand() cli.Command {
 			if fileName == "" {
 				fileName = fileNameDefault
 			}
-			list, err := parseFromFile(c.String("file"))
+			list, err := parseFromFile(fileName)
 			if err != nil {
 				fmt.Println(err)
 				return err
@@ -108,7 +112,7 @@ func switchStatusCommand() cli.Command {
 			if fileName == "" {
 				fileName = fileNameDefault
 			}
-			listByFile, err := parseFromFile(c.String("file"))
+			listByFile, err := parseFromFile(fileName)
 			if err != nil {
 				fmt.Println(err)
 				return err
@@ -118,7 +122,7 @@ func switchStatusCommand() cli.Command {
 			if date == "" {
 				date = today
 			}
-			listByPeriod, err := dayListByPeriod(listByFile, c.String("date"))
+			listByPeriod, err := dayListByPeriod(listByFile, date)
 			if err != nil {
 				fmt.Println(err)
 				return err
@@ -153,7 +157,7 @@ func deleteCommand() cli.Command {
 			if fileName == "" {
 				fileName = fileNameDefault
 			}
-			listByFile, err := parseFromFile(c.String("file"))
+			listByFile, err := parseFromFile(fileName)
 			if err != nil {
 				fmt.Println(err)
 				return err
@@ -163,14 +167,14 @@ func deleteCommand() cli.Command {
 			if date == "" {
 				date = today
 			}
-			listByPeriod, err := dayListByPeriod(listByFile, c.String("date"))
+			listByPeriod, err := dayListByPeriod(listByFile, date)
 			if err != nil {
 				fmt.Println(err)
 				return err
 			}
 
 			number := c.Int("number")
-			deleteTodo(listByFile, listByPeriod, number)
+			listByFile = deleteTodo(listByFile, listByPeriod, number)
 			save(listByFile, fileName)
 			if err != nil {
 				fmt.Println(err)

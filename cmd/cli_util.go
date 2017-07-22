@@ -15,7 +15,7 @@ const (
 	yesterday       string = "yesterday"
 	today           string = "today"
 	tomorrow        string = "tomorrow"
-	fileNameDefault string = "task.todo"
+	fileNameDefault string = "tasks.todo"
 )
 
 func parseFromFile(fileName string) (list task.DayList, err error) {
@@ -137,11 +137,11 @@ func switchTodoStatus(original, new task.DayList, id int) {
 	}
 }
 
-// deleteTodo removes the n-th todo from the new list and then updates the original list with the changed values of the
-// new list
+// deleteTodo removes the n-th todo from the new list and then updates the original list with all the remaining
+// todos from new and then returns original then
 //
 // Note that new has to be a sublist of original
-func deleteTodo(original task.DayList, new task.DayList, n int) {
+func deleteTodo(original task.DayList, new task.DayList, n int) task.DayList {
 	var newDay task.Day
 	for i, day := range new {
 		for j := range day.Todos {
@@ -161,6 +161,7 @@ func deleteTodo(original task.DayList, new task.DayList, n int) {
 	}
 
 	original.SetDay(newDay)
+	return original
 }
 
 func dayListByPeriod(dayList task.DayList, period string) (task.DayList, error) {
@@ -260,5 +261,6 @@ func deleteEmpty(s []string) []string {
 			r = append(r, str)
 		}
 	}
+
 	return r
 }
