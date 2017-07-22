@@ -76,6 +76,11 @@ func (p *Parser) Parse() (task.Day, error) {
 			return taskDay, nil
 		}
 
+		if tok != DASH  {
+			return taskDay, fmt.Errorf("found %q, expected -", lit)
+		}
+
+		tok, lit = p.scanIgnoreWhitespace()
 		if tok != STATUS_OPEN {
 			return taskDay, fmt.Errorf("found %q, expected [", lit)
 		}
@@ -100,7 +105,7 @@ func (p *Parser) Parse() (task.Day, error) {
 			//Read a field
 			tok, lit := p.Scan()
 
-			if !isDescriptionToken(tok) && tok != STATUS_OPEN && tok != EOF && tok != HASHTAG {
+			if !isDescriptionToken(tok) && tok != DASH && tok != EOF && tok != HASHTAG {
 				return taskDay, fmt.Errorf("found %q, expected field", lit)
 			}
 
@@ -111,7 +116,7 @@ func (p *Parser) Parse() (task.Day, error) {
 				return taskDay, nil
 			}
 
-			if tok == STATUS_OPEN {
+			if tok == DASH {
 				p.UnreadRune()
 				break
 			}
@@ -136,6 +141,5 @@ func isDescriptionToken(tok Token) bool {
 		tok == BRACKET ||
 		tok == CURRENCY_SIGN ||
 		tok == PARAGRAPH ||
-		tok == DASH ||
 		tok == UNDERSCORE
 }

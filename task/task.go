@@ -14,9 +14,9 @@ type Todo struct {
 
 func (t Todo) String() string {
       if t.Complete {
-          return "[X] " + t.Description
+          return "- [x] " + t.Description
       }
-      return "[ ] " + t.Description
+      return "- [ ] " + t.Description
 }
 
 // TodoList is a simple list of Todos
