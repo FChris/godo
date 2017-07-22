@@ -244,7 +244,7 @@ func redateCommand() cli.Command {
 func fileFlag() cli.Flag {
 	return cli.StringFlag{
 		Name:  "file, f",
-		Usage: "Load tasks from file",
+		Usage: "load tasks from file. If no file name is given " + fileNameDefault + " will be used as a default",
 	}
 }
 
@@ -252,6 +252,7 @@ func dateFlag() cli.Flag {
 	return cli.StringFlag{
 		Name: "date, d",
 		Usage: "date or time for the command. Allows dates as 'dd.mm.yy', 'dd.mm.yy-dd.mm.yy' " +
-			"or as 'yesterday', 'today', 'tomorrow', or '-' for all days",
+			"or as \n\t'yesterday', 'today', 'tomorrow', or '-' for all days. If no date is given " + today +
+			"\n\twill be used as a default",
 	}
 }
