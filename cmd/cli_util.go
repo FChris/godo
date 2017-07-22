@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-var dayList task.DayList
-
 const (
 	yesterday       string = "yesterday"
 	today           string = "today"
@@ -89,7 +87,9 @@ func save(dayList task.DayList, fileName string) error {
 	return nil
 }
 
-func addTodoFromDesc(original task.DayList, desc string, date string) error {
+// addTodoFromDesc returns an updated original list with a new todo based on desc inserted into day with date or an
+// error and an unchanged original in case something goes wrong
+func addTodoFromDesc(original task.DayList, desc string, date string) (task.DayList, error) {
 	var d time.Time
 	var err error
 	if isRelativeDayDescription(date) {
@@ -97,7 +97,7 @@ func addTodoFromDesc(original task.DayList, desc string, date string) error {
 	} else {
 		d, err = time.Parse(parse.Timeformat, date)
 		if err != nil {
-			return err
+			return original, err
 		}
 	}
 
@@ -107,19 +107,20 @@ func addTodoFromDesc(original task.DayList, desc string, date string) error {
 
 	if err != nil {
 		err = fmt.Errorf("Parsing from description: %s", err)
-		return err
+		return original, err
 	}
 
-	addDayList(original, parsedDayList)
-	return nil
+	return addDayList(original, parsedDayList), err
 }
 
-func addDayList(original, new task.DayList) {
+func addDayList(original, new task.DayList) task.DayList{
 	for _, newDay := range new {
 		d := original.DayByDate(newDay.Date)
 		d.Todos.Insert(newDay.Todos)
-		dayList.SetDay(d)
+		original.SetDay(d)
 	}
+
+	return original
 }
 
 func switchTodoStatus(original, new task.DayList, id int) {

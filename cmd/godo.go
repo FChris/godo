@@ -33,7 +33,11 @@ func printCommand() cli.Command {
 			if err != nil {
 				return err
 			}
-			periodList, err := dayListByPeriod(list, c.String("date"))
+			date := c.String("date")
+			if date == "" {
+				date = today
+			}
+			periodList, err := dayListByPeriod(list, date)
 			if err != nil {
 				fmt.Println(err)
 				return err
@@ -72,7 +76,7 @@ func addCommand() cli.Command {
 				date = today
 			}
 			text := c.String("text")
-			err = addTodoFromDesc(list, text, date)
+			list, err = addTodoFromDesc(list, text, date)
 			if err != nil {
 				fmt.Println(err)
 				return err
@@ -188,6 +192,6 @@ func dateFlag() cli.Flag {
 	return cli.StringFlag{
 		Name: "date, d",
 		Usage: "date or time for the command. Allows dates as 'dd.mm.yy', 'dd.mm.yy-dd.mm.yy' " +
-			"or as 'yesterday', 'today', 'tomorrow'",
+			"or as 'yesterday', 'today', 'tomorrow', or '-' for all days",
 	}
 }
