@@ -113,7 +113,7 @@ func addTodoFromDesc(original task.DayList, desc string, date string) (task.DayL
 	return addDayList(original, parsedDayList), err
 }
 
-func addDayList(original, new task.DayList) task.DayList{
+func addDayList(original, new task.DayList) task.DayList {
 	for _, newDay := range new {
 		d := original.DayByDate(newDay.Date)
 		d.Todos.Insert(newDay.Todos)
@@ -164,7 +164,38 @@ func deleteTodo(original task.DayList, new task.DayList, n int) task.DayList {
 	return original
 }
 
-func dayListByPeriod(dayList task.DayList, period string) (task.DayList, error) {
+func changeDateOfTodo(original task.DayList, new task.DayList, dayDescription string, n int) (task.DayList, error) {
+	var date time.Time
+
+	if isRelativeDayDescription(dayDescription) {
+		date = dateByRelativeDayDescription(dayDescription)
+	} else {
+		var err error
+		date, err = time.Parse(parse.Timeformat, dayDescription)
+		if err != nil {
+			err = fmt.Errorf("Error while parsing from date: %s", err)
+			return original, err
+		}
+	}
+
+	var todo task.Todo
+	for i, day := range new {
+		for j, t := range day.Todos {
+			if i+j+1 == n {
+				todo = t
+			}
+		}
+	}
+
+	dayToInsert := original.DayByDate(date)
+	dayToInsert.Todos.InsertTodo(todo)
+	original.SetDay(dayToInsert)
+	original = deleteTodo(original, new, n)
+	sort.Sort(original)
+	return original, nil
+}
+
+func dayListByPeriod(original task.DayList, period string) (task.DayList, error) {
 	dayDescription := strings.ToLower(period)
 	var fromDate time.Time
 	var toDate time.Time
@@ -204,10 +235,10 @@ func dayListByPeriod(dayList task.DayList, period string) (task.DayList, error) 
 	fromDate = ignoreTime(fromDate)
 	toDate = ignoreTime(toDate)
 
-	sort.Sort(dayList)
+	sort.Sort(original)
 
 	var periodDayList task.DayList
-	for _, day := range dayList {
+	for _, day := range original {
 
 		if inTimeSpan(fromDate, toDate, day.Date) {
 			periodDayList.SetDay(day)

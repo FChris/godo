@@ -13,7 +13,7 @@ func main() {
 	app.Usage = "A small go tool to manage todo files"
 
 	app.Commands = []cli.Command{
-		printCommand(), addCommand(), switchStatusCommand(), deleteCommand(),
+		printCommand(), addCommand(), switchStatusCommand(), deleteCommand(), redateCommand(),
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
@@ -180,6 +180,59 @@ func deleteCommand() cli.Command {
 				fmt.Println(err)
 				return err
 			}
+			return nil
+		},
+	}
+}
+
+func redateCommand() cli.Command {
+	return cli.Command{
+		Name:  "redate",
+		Usage: "redates the n-th todo in the list of given todos by date to the new date",
+		Flags: []cli.Flag{
+			fileFlag(),
+			dateFlag(),
+			cli.IntFlag{
+				Name:  "number, n",
+				Usage: "number of the todo which will be redated",
+			},
+			cli.StringFlag{
+				Name:  "newdate",
+				Usage: "new date for the todo. Allows dates as 'dd.mm.yy',or as 'yesterday', 'today', 'tomorrow'",
+			},
+		},
+		Action: func(c *cli.Context) error {
+			fileName := c.String("file")
+			if fileName == "" {
+				fileName = fileNameDefault
+			}
+			listByFile, err := parseFromFile(fileName)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+
+			date := c.String("date")
+			if date == "" {
+				date = today
+			}
+			listByPeriod, err := dayListByPeriod(listByFile, date)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+
+			number := c.Int("number")
+			newDate := c.String("newdate")
+			if newDate == "" {
+				newDate = today
+			}
+			listByFile, err = changeDateOfTodo(listByFile, listByPeriod, newDate, number)
+			if err != nil {
+				fmt.Println(err)
+				return err
+			}
+			save(listByFile, fileName)
 			return nil
 		},
 	}
