@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -7,7 +7,8 @@ import (
 	"sort"
 )
 
-func main() {
+// RunCLI executes the Command Line Interface for GoDo
+func RunCLI(messages chan string) {
 	app := cli.NewApp()
 	app.Name = "GoDo"
 	app.Usage = "A small go tool to manage todo files"
@@ -20,6 +21,8 @@ func main() {
 	sort.Sort(cli.CommandsByName(app.Commands))
 
 	app.Run(os.Args)
+
+	messages <- "Finished"
 }
 
 func printCommand() cli.Command {
