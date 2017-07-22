@@ -12,6 +12,7 @@ func RunCLI(messages chan string) {
 	app := cli.NewApp()
 	app.Name = "GoDo"
 	app.Usage = "A small go tool to manage todo files"
+	app.Version = "0.0.1"
 
 	app.Commands = []cli.Command{
 		printCommand(), addCommand(), switchStatusCommand(), deleteCommand(), redateCommand(),
