@@ -89,6 +89,4 @@ suggested that you simply first print the list for a given date to find out the 
 I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/godo/edit/master/CONTRIBUTING.md) for ways to contribute.
 
 ## Further Work
-* The tool will be expanded to provide edit and re-date functionality and the code basis will have to be cleaned up.
-* I am considering basing the command line interface on https://github.com/urfave/cli since this seems a lot more mature.
 * Also I am looking for a new name as godo is used already a lot in other projects.
