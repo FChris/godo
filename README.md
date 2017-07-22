@@ -45,7 +45,7 @@ In case you haven't set up go yet you can follow the instructions provided by th
 
 ## Usage
 
-Godo works with a markdown like structure for Todo Lists.
+towg works with a markdown like structure for Todo Lists.
 
 Todos are sorted by date in the format dd.mm.yy and by completeness
 
