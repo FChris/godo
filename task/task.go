@@ -130,3 +130,15 @@ func (t *DayList) SetDay(day Day) {
 
 	*t = newList
 }
+
+func (t *DayList) DeleteDay(date time.Time) {
+	var newList []Day
+	if t.HasDate(date) {
+		for _, d := range *t {
+			if !(d.Date.Year() == date.Year() && date.YearDay() == d.Date.YearDay()) {
+				newList = append(newList, d)
+			}
+		}
+	}
+	*t = newList
+}
