@@ -101,7 +101,7 @@ func addTodoFromDesc(original task.DayList, desc string, date string) (task.DayL
 		}
 	}
 
-	todoString := "# " + d.Format(parse.Timeformat) + " [ ] " + desc
+	todoString := "# " + d.Format(parse.Timeformat) + " - [ ] " + desc
 
 	parsedDayList, err := parseData(strings.NewReader(todoString))
 
