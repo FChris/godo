@@ -160,7 +160,11 @@ func deleteTodo(original task.DayList, new task.DayList, n int) task.DayList {
 		}
 	}
 
-	original.SetDay(newDay)
+	if newDay.Todos.Len() == 0 {
+		original.DeleteDay(newDay.Date)
+	} else {
+		original.SetDay(newDay)
+	}
 	return original
 }
 
