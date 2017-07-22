@@ -46,41 +46,44 @@ In case you haven't set up go yet you can follow the instructions provided by th
 
 Godo works with a markdown like structure for Todo Lists.
 
-Todos are sorted by date in the format dd.mm.yy
+Todos are sorted by date in the format dd.mm.yy and by completeness
 
 An Example Todo file would look like this:
 ```
   # 17.07.17
   
-  [X] Todo 25
-  [X] Todo 27
-  [ ] Todo 2
-  [ ] Todo 7
+- [X] Todo 25
+- [X] Todo 27
+- [ ] Todo 2
+- [ ] Todo 7
 
   # 14.07.17
 
-  [X] Todo 2
-  [X] Todo 27
-  [ ] Todo 25
-  [ ] Todo 7
+- [X] Todo 2
+- [X] Todo 27
+- [ ] Todo 25
+- [ ] Todo 7
 ```
 
 Files are given to godo with the -f flag.
 
-If you want to print all Todos in the file you can use the -p flag. For example:  
-  ``` godo -f mytodolist.todo -p```
+If you want to print all Todos in the file you can use the print subcommand flag. For example:  
+  ``` godo print -f mytodolist.todo -d -```
   
 If you want to print all Todos for a given day you can specify a date with -d. For example:  
-  ``` godo -f mytodolist.todo -p -d 10.10.17```  
-  ``` godo -f mytodolist.todo -p -d yesterday```  
-  ``` godo -f mytodolist.todo -p -d today```  
-  ``` godo -f mytodolist.todo -p -d tomorrow```  
+  ``` godo print -f mytodolist.todo -d 10.10.17```  
+  ``` godo print -f mytodolist.todo -d yesterday```  
+  ``` godo print -f mytodolist.todo -d today```  
+  ``` godo print -f mytodolist.todo -d tomorrow```  
 
 If you want to set a Todo to complete you have to use the -s flag and an id provided with -i:  
 The id indicates the i-th Todo in the list you would see if you printed it. For example:  
-   ```godo -f mytodolist.todo -i 5 -s``` Switches the status of the 5th entry in the whole file.  
-   ```godo -f mytodolist.todo -i 4 -s -d today``` Switches the status of the 5th entry in the list for today.  
+   ```godo switch -f mytodolist.todo -n 5 ``` Switches the status of the 5th entry in the whole file.  
+   ```godo switch -f mytodolist.todo -n 4 -d today``` Switches the status of the 5th entry in the list for today.  
    
+Other subcommands are redate, delete and add. They work similarly the commands described above.
+You can get an info text for all commands by executing ```godo <command> -h```.  
+
 Todolists stay the same unless a status is switched (or in later versions the description changes). Therefor it is 
 suggested that you simply first print the list for a given date to find out the position of your todo and then switch the status.
 
