@@ -3,7 +3,7 @@ package parse
 import (
 	"bytes"
 	"fmt"
-	"github.com/fchris/godo/task"
+	"github.com/fchris/towg/task"
 	"io"
 	"strings"
 	"time"

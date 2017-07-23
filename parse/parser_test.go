@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"github.com/fchris/godo/task"
+	"github.com/fchris/towg/task"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
@@ -9,7 +9,7 @@ import (
 )
 
 func TestParseString(t *testing.T) {
-	parser := NewParser(strings.NewReader("# 01.01.20 [ ] Test String"))
+	parser := NewParser(strings.NewReader("# 01.01.20 - [ ] Test String"))
 	day, err := parser.Parse()
 	assert.Equal(
 		t,
@@ -34,9 +34,9 @@ func TestParseString(t *testing.T) {
 }
 
 func TestParseMultilineString(t *testing.T) {
-	p := NewParser(strings.NewReader("# 01.01.20 [x] Test String\n" +
-		"[ ] Test String2 \n" +
-		"# 01.02.20 [ ] Test String2\n"))
+	p := NewParser(strings.NewReader("# 01.01.20 - [x] Test String\n" +
+		"- [ ] Test String2 \n" +
+		"# 01.02.20 - [ ] Test String2\n"))
 
 	day, err := p.Parse()
 	assert.Equal(t, nil, err, "Error is not nil")
