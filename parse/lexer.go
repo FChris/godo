@@ -10,39 +10,44 @@ import (
 type Token int
 
 const (
-	//Special
-	ILLEGAL = iota //ILLEGAL represents anything that cannot be identified by any other token
-	EOF            //EOF represents the end of file token
-	WS             //WS identifies a whitespace
 
-	//Literals
-	IDENT //todos and dates
+	//illegal represents anything that cannot be identified by any other token
+	illegal = iota
 
-	//Key Symbols
-	STATUS_OPEN  //[
-	STATUS_CLOSE //]
+	//eof represents the end of file token
+	eof
 
-	//Misc
-	SLASH         // /
-	SEMICOLON     // ;
-	COLON         // :
-	ASTERISK      // *
-	COMMA         // ,
-	DOT           // .
-	HASHTAG       // #
-	BRACKET       // ( )
-	CURRENCY_SIGN // $ €
-	PARAGRAPH     // §
-	AMPERSAND     // &
-	EQUALS        // =
-	TILDE         // ~
-	AT            // @
-	PERCENT       // %
-	DASH          // -
-	UNDERSCORE    // _
+	//ws identifies a whitespace
+	ws
+
+	//ident are identifiers of todos and dates
+	ident
+
+	//statusOpen is the token for [
+	statusOpen
+	//statusClose is is the token for ]
+	statusClose
+
+	slash         // /
+	semicolon     // ;
+	colon         // :
+	asterisk      // *
+	comma         // ,
+	dot           // .
+	hashtag       // #
+	bracket       // ( )
+	currencySign  // $ €
+	paragraph     // §
+	ampersand     // &
+	equals        // =
+	tilde         // ~
+	at            // @
+	percent       // %
+	dash          // -
+	underscore    // _
 )
 
-var eof = rune(0)
+var endoffile = rune(0)
 
 //Scanner represents a lexical scanner
 type scanner struct {
@@ -55,11 +60,11 @@ func NewScanner(r io.Reader) *scanner {
 }
 
 //read reads the next rune from the buffered reader.
-//Returns the rune(0) if an error occurs(or io.EOF is returned).
+//Returns the rune(0) if an error occurs(or io.eof is returned).
 func (s *scanner) read() rune {
 	r, _, err := s.ReadRune()
 	if err != nil {
-		return eof
+		return endoffile
 	}
 
 	return r
@@ -82,29 +87,29 @@ func (s *scanner) Scan() (tok Token, lit string) {
 	//Otherwise read individual character
 	switch ch {
 	case '#':
-		return HASHTAG, "#"
+		return hashtag, "#"
 	case '[':
-		return STATUS_OPEN, "["
+		return statusOpen, "["
 	case ']':
-		return STATUS_CLOSE, "]"
+		return statusClose, "]"
 	case ',':
-		return COMMA, ","
+		return comma, ","
 	case '.':
-		return DOT, "."
+		return dot, "."
 	case ':':
-		return COLON, ":"
+		return colon, ":"
 	case ';':
-		return SEMICOLON, ";"
+		return semicolon, ";"
 	case '/':
-		return SLASH, "/"
+		return slash, "/"
 	case '*':
-		return ASTERISK, "*"
+		return asterisk, "*"
 	case '(':
 		fallthrough
 	case ')':
-		return BRACKET, string(ch)
+		return bracket, string(ch)
 	case '~':
-		return TILDE, "~"
+		return tilde, "~"
 	case '€':
 		fallthrough
 	case '$':
@@ -112,26 +117,26 @@ func (s *scanner) Scan() (tok Token, lit string) {
 	case '£':
 		fallthrough
 	case '¥':
-		return CURRENCY_SIGN, string(ch)
+		return currencySign, string(ch)
 	case '§':
-		return PARAGRAPH, "§"
+		return paragraph, "§"
 	case '&':
-		return AMPERSAND, "&"
+		return ampersand, "&"
 	case '=':
-		return EQUALS, "="
+		return equals, "="
 	case '@':
-		return AT, "@"
+		return at, "@"
 	case '%':
-		return PERCENT, "%"
+		return percent, "%"
 	case '-':
-		return DASH, "-"
+		return dash, "-"
 	case '_':
-		return UNDERSCORE, "_"
-	case eof:
-		return EOF, string(ch)
+		return underscore, "_"
+	case endoffile:
+		return eof, string(ch)
 	}
 
-	return ILLEGAL, string(ch)
+	return illegal, string(ch)
 }
 
 func (s *scanner) scanWhitespace() (tok Token, lit string) {
@@ -140,7 +145,7 @@ func (s *scanner) scanWhitespace() (tok Token, lit string) {
 	buf.WriteRune(s.read())
 
 	//Read every subsequent whitespace into the buffer.
-	//Non Whitspace Characters and EOF will cause the loop to exit
+	//Non Whitspace Characters and eof will cause the loop to exit
 	for {
 		if ch := s.read(); ch == eof {
 			break
@@ -152,7 +157,7 @@ func (s *scanner) scanWhitespace() (tok Token, lit string) {
 		}
 	}
 
-	return WS, buf.String()
+	return ws, buf.String()
 }
 
 func (s *scanner) scanIdent() (tok Token, lit string) {
@@ -160,7 +165,7 @@ func (s *scanner) scanIdent() (tok Token, lit string) {
 	buf.WriteRune(s.read())
 
 	//Read every subsequent ident character into the buffer.
-	//Non ident Characters and EOF will cause the loop to exit
+	//Non ident Characters and eof will cause the loop to exit
 
 	for {
 		if ch := s.read(); ch == eof {
@@ -173,7 +178,7 @@ func (s *scanner) scanIdent() (tok Token, lit string) {
 		}
 	}
 
-	return IDENT, buf.String()
+	return ident, buf.String()
 }
 
 func isWhitespace(ch rune) bool {
