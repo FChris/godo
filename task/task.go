@@ -131,6 +131,7 @@ func (t *DayList) SetDay(day Day) {
 	*t = newList
 }
 
+// DeleteDay removes a day completely from the DayList
 func (t *DayList) DeleteDay(date time.Time) {
 	var newList []Day
 	if t.HasDate(date) {
