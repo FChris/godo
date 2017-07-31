@@ -2,6 +2,7 @@
 ## A small go tool to manage todo files
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
+[![Go Report Card](https://goreportcard.com/badge/github.com/fchris/towg)](https://goreportcard.com/report/github.com/fchris/towg)
 
 ## Background
 
