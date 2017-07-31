@@ -50,8 +50,6 @@ func parseData(r io.Reader) (list task.DayList, err error) {
 
 		list.SetDay(day)
 	}
-
-	return
 }
 
 func save(dayList task.DayList, fileName string) error {
