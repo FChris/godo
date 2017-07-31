@@ -28,23 +28,23 @@ const (
 	//statusClose is is the token for ]
 	statusClose
 
-	slash         // /
-	semicolon     // ;
-	colon         // :
-	asterisk      // *
-	comma         // ,
-	dot           // .
-	hashtag       // #
-	bracket       // ( )
-	currencySign  // $ €
-	paragraph     // §
-	ampersand     // &
-	equals        // =
-	tilde         // ~
-	at            // @
-	percent       // %
-	dash          // -
-	underscore    // _
+	slash        // /
+	semicolon    // ;
+	colon        // :
+	asterisk     // *
+	comma        // ,
+	dot          // .
+	hashtag      // #
+	bracket      // ( )
+	currencySign // $ €
+	paragraph    // §
+	ampersand    // &
+	equals       // =
+	tilde        // ~
+	at           // @
+	percent      // %
+	dash         // -
+	underscore   // _
 )
 
 var endoffile = rune(0)

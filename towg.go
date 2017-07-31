@@ -9,7 +9,6 @@ func main() {
 	go cmd.RunCLI(messages)
 
 	//Wait for a message to show the CLI has finished
-	 <-messages
+	<-messages
 
 }
-
