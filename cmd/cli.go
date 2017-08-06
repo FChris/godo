@@ -90,10 +90,6 @@ func addCommand() cli.Command {
 				return err
 			}
 			save(list, fileName)
-			if err != nil {
-				fmt.Println(err)
-				return err
-			}
 			return nil
 		},
 	}
@@ -135,10 +131,6 @@ func switchStatusCommand() cli.Command {
 			number := c.Int("number")
 			switchTodoStatus(listByFile, listByPeriod, number)
 			save(listByFile, fileName)
-			if err != nil {
-				fmt.Println(err)
-				return err
-			}
 			return nil
 		},
 	}
@@ -178,12 +170,12 @@ func deleteCommand() cli.Command {
 			}
 
 			number := c.Int("number")
-			listByFile = deleteTodo(listByFile, listByPeriod, number)
-			save(listByFile, fileName)
+			listByFile, err = deleteTodo(listByFile, listByPeriod, number - 1)
 			if err != nil {
 				fmt.Println(err)
 				return err
 			}
+			save(listByFile, fileName)
 			return nil
 		},
 	}
