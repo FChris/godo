@@ -4,7 +4,10 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"fmt"
 )
+
+var oobErr error = fmt.Errorf("index out of bounds")
 
 // Todo is the base type for all tasks we want to save
 type Todo struct {
@@ -115,7 +118,7 @@ func (t DayList) DayByDate(date time.Time) Day {
 // SetDay inserts a given day into the DayList. If the day is already in the list it is overwritten otherwise
 // it is simply appended
 func (t *DayList) SetDay(day Day) {
-	var newList []Day
+	var newList DayList
 	if t.HasDate(day.Date) {
 		for _, d := range *t {
 			if d.Date.Year() == day.Date.Year() && day.Date.YearDay() == d.Date.YearDay() {
@@ -142,4 +145,39 @@ func (t *DayList) DeleteDay(date time.Time) {
 		}
 	}
 	*t = newList
+}
+
+func (t *DayList) InsertTodo(date time.Time, todo Todo) {
+	day := t.DayByDate(date)
+	day.Todos.InsertTodo(todo)
+	t.SetDay(day)
+	sort.Sort(t)
+}
+
+func (t *DayList) DeleteTodo(date time.Time, ind int) error {
+	day := t.DayByDate(date)
+	if ind < 0 || ind >= day.Todos.Len() {
+		return oobErr
+	}
+	day.Todos = append(day.Todos[:ind], day.Todos[ind+1:]...)
+	t.SetDay(day)
+	return nil
+}
+
+func (t *DayList) TransformToDayBasedIndex(ind int) (date time.Time, transInd int, err error) {
+	if ind < 0 {
+		err = oobErr
+		return
+	}
+	transInd = ind
+	for _, d := range *t {
+		if transInd >= d.Todos.Len() {
+			transInd -= d.Todos.Len()
+		} else {
+			date = d.Date
+			return
+		}
+	}
+	err = oobErr
+	return
 }

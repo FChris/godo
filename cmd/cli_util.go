@@ -139,31 +139,14 @@ func switchTodoStatus(original, new task.DayList, id int) {
 // todos from new and then returns original then
 //
 // Note that new has to be a sublist of original
-func deleteTodo(original task.DayList, new task.DayList, n int) task.DayList {
-	var newDay task.Day
-	for i, day := range new {
-		for j := range day.Todos {
-			if i+j+1 == n {
-				newDay.Date = day.Date
-			}
-		}
+func deleteTodo(original task.DayList, subList task.DayList, n int) (new task.DayList, err error) {
+	new = original
+	d, ind, err := subList.TransformToDayBasedIndex(n)
+	if err != nil {
+		return
 	}
-
-	//Todo find more efficient way to do this instead of running through the whole list twice
-	for i, day := range new {
-		for j, todo := range day.Todos {
-			if i+j+1 != n && day.Date == newDay.Date {
-				newDay.Todos.InsertTodo(todo)
-			}
-		}
-	}
-
-	if newDay.Todos.Len() == 0 {
-		original.DeleteDay(newDay.Date)
-	} else {
-		original.SetDay(newDay)
-	}
-	return original
+	err = new.DeleteTodo(d, ind)
+	return
 }
 
 func changeDateOfTodo(original task.DayList, new task.DayList, dayDescription string, n int) (task.DayList, error) {
@@ -180,20 +163,18 @@ func changeDateOfTodo(original task.DayList, new task.DayList, dayDescription st
 		}
 	}
 
-	var todo task.Todo
-	for i, day := range new {
-		for j, t := range day.Todos {
-			if i+j+1 == n {
-				todo = t
-			}
-		}
+	d, ind, err := new.TransformToDayBasedIndex(n - 1)
+	if err != nil {
+		return original, fmt.Errorf("Error while retrieving specified todo: %s", err)
 	}
 
-	dayToInsert := original.DayByDate(date)
-	dayToInsert.Todos.InsertTodo(todo)
-	original.SetDay(dayToInsert)
-	original = deleteTodo(original, new, n)
-	sort.Sort(original)
+	todo := original.DayByDate(d).Todos[ind]
+	err = original.DeleteTodo(d, ind)
+	if err != nil {
+		return original, fmt.Errorf("Error while deleting todo from old day: %s", err)
+	}
+
+	original.InsertTodo(date, todo)
 	return original, nil
 }
 
