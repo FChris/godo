@@ -19,11 +19,11 @@ The main goals for this tool are:
 Some of the features are already implemented, some of those still need some work.
 
 Also the development and testing so far has only been done on Linux. So there might be issues on other systems. 
-If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Take a look at the [contributing guidelines](https://github.com/FChris/towg/edit/master/CONTRIBUTING.md) for that.
+If you find any bugs or misbehaviour you can file a bug report or provide a fix right away. Take a look at the [contributing guidelines](https://github.com/FChris/towg/blob/master/CONTRIBUTING.md) for that.
 
 ## Installation
 
-If you have your go enviroment set up already, you can simply execute
+If you have your go environment set up already, you can simply execute
 
 ```go get github.com/fchris/towg/cmd```
 
@@ -39,7 +39,7 @@ and executing
 
 ```go install cmd/towg.go```
 
-If your `$GOBIN` folder is part of your `$PATH` you can simply execute it as shown in [Usage](#Usage),
+If your `$GOBIN` folder is part of your `$PATH` you can simply execute it as shown in [Usage](#usage),
 otherwise you can execute it with `$GOBIN/towg`.
 
 In case you haven't set up go yet you can follow the instructions provided by the [official site](https://golang.org/doc/install)
@@ -91,7 +91,7 @@ suggested that you simply first print the list for a given date to find out the 
 
 ## Contributing
 
-I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/towg/edit/master/CONTRIBUTING.md/blob/master/CONTRIBUTING.md) for ways to contribute.
+I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/towg/blob/master/CONTRIBUTING.md) for ways to contribute.
 
 ## Further Work
 * Also I am looking for a new name as towg is used already a lot in other projects.
