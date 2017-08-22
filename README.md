@@ -3,6 +3,7 @@
 
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](http://makeapullrequest.com)
 [![Go Report Card](https://goreportcard.com/badge/github.com/fchris/towg)](https://goreportcard.com/report/github.com/fchris/towg)
+[![Build Status](https://travis-ci.org/FChris/towg.svg?branch=master)](https://travis-ci.org/FChris/towg)
 
 ## Background
 
