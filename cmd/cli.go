@@ -170,7 +170,7 @@ func deleteCommand() cli.Command {
 			}
 
 			number := c.Int("number")
-			listByFile, err = deleteTodo(listByFile, listByPeriod, number - 1)
+			listByFile, err = deleteTodo(listByFile, listByPeriod, number-1)
 			if err != nil {
 				fmt.Println(err)
 				return err
