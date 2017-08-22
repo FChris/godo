@@ -1,13 +1,13 @@
 package task
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 	"time"
-	"fmt"
 )
 
-var oobErr error = fmt.Errorf("index out of bounds")
+var errOob = fmt.Errorf("index out of bounds")
 
 // Todo is the base type for all tasks we want to save
 type Todo struct {
@@ -147,6 +147,7 @@ func (t *DayList) DeleteDay(date time.Time) {
 	*t = newList
 }
 
+// InsertTodo inserts the todo into the day of this DayList corresponding to the given date
 func (t *DayList) InsertTodo(date time.Time, todo Todo) {
 	day := t.DayByDate(date)
 	day.Todos.InsertTodo(todo)
@@ -154,19 +155,22 @@ func (t *DayList) InsertTodo(date time.Time, todo Todo) {
 	sort.Sort(t)
 }
 
+// DeleteTodo delets the todo from the day of this DayList corresponding to the given date
 func (t *DayList) DeleteTodo(date time.Time, ind int) error {
 	day := t.DayByDate(date)
 	if ind < 0 || ind >= day.Todos.Len() {
-		return oobErr
+		return errOob
 	}
 	day.Todos = append(day.Todos[:ind], day.Todos[ind+1:]...)
 	t.SetDay(day)
 	return nil
 }
 
+// TransformToDayBasedIndex transforms the given index that corresponds to this whole DayList into an index
+// which corresponds the the day in the DayList for the given date
 func (t *DayList) TransformToDayBasedIndex(ind int) (date time.Time, transInd int, err error) {
 	if ind < 0 {
-		err = oobErr
+		err = errOob
 		return
 	}
 	transInd = ind
@@ -178,6 +182,6 @@ func (t *DayList) TransformToDayBasedIndex(ind int) (date time.Time, transInd in
 			return
 		}
 	}
-	err = oobErr
+	err = errOob
 	return
 }
