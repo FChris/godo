@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/fchris/towg/cmd"
+	"github.com/FChris/towg/cmd"
 )
 
 func main() {

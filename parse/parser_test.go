@@ -1,7 +1,7 @@
 package parse
 
 import (
-	"github.com/fchris/towg/task"
+	"github.com/FChris/towg/task"
 	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
