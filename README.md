@@ -5,9 +5,11 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/fchris/towg)](https://goreportcard.com/report/github.com/fchris/towg)
 [![Build Status](https://travis-ci.org/FChris/towg.svg?branch=master)](https://travis-ci.org/FChris/towg)
 
-## Background
+## Disclaimer
 
-This is work in progress, it may have some breaking changes until declared stable and probably does not provide all the functionality you might expect yet.  
+This project is not under active development anymore. I did this project simply to learn the Go programming language. After using it for a while I came to the conclusion that [todo.txt](http://todotxt.com/) is just far superior and more mature as a tool. I recommend you use this instead.
+
+## Background
 
 The main reason for developing this project instead of using [todo.txt](http://todotxt.com/) was a matter of taste and a chance to learn the Go programming language. 
 
@@ -93,6 +95,3 @@ suggested that you simply first print the list for a given date to find out the 
 ## Contributing
 
 I would love to hear your feedback and input. Check out the [contributing guidelines](https://github.com/FChris/towg/blob/master/CONTRIBUTING.md) for ways to contribute.
-
-## Further Work
-* Also I am looking for a new name as towg is used already a lot in other projects.
